@@ -116,5 +116,9 @@ extension ViewController: UITableViewDataSource {
 }
 
 extension ViewController: UITableViewDelegate {
-
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let repository = repositories[indexPath.row]
+        let detailVC = DetailViewController(repository: repository)
+        navigationController?.pushViewController(detailVC, animated: true)
+    }
 }

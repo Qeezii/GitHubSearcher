@@ -20,11 +20,13 @@ struct RepositoryResponse: Codable {
 }
 
 struct Repository: Codable {
+    let name: String
     let fullName: String
-    let owner: Owner
+    var owner: Owner
     let description: String?
 
     enum CodingKeys: String, CodingKey {
+        case name
         case fullName = "full_name"
         case owner
         case description
@@ -33,9 +35,13 @@ struct Repository: Codable {
 
 struct Owner: Codable {
     let login: String
+    let name: String?
+    let email: String?
 
     enum CodingKeys: String, CodingKey {
         case login
+        case name
+        case email
     }
 }
 

@@ -16,6 +16,7 @@
 		9CCCBE7A2A055A770004E7AC /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 9CCCBE792A055A770004E7AC /* SnapKit */; };
 		9CCCBE832A08EF2A0004E7AC /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 9CCCBE822A08EF2A0004E7AC /* Alamofire */; };
 		9CCCBE8B2A08FF400004E7AC /* Repository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CCCBE8A2A08FF400004E7AC /* Repository.swift */; };
+		9CCCBE942A0927150004E7AC /* DetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CCCBE932A0927150004E7AC /* DetailViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,6 +29,7 @@
 		9CCCBE702A0556B40004E7AC /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		9CCCBE722A0556B40004E7AC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9CCCBE8A2A08FF400004E7AC /* Repository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Repository.swift; sourceTree = "<group>"; };
+		9CCCBE932A0927150004E7AC /* DetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -86,6 +88,7 @@
 			isa = PBXGroup;
 			children = (
 				9CCCBE652A0556B30004E7AC /* ViewController.swift */,
+				9CCCBE932A0927150004E7AC /* DetailViewController.swift */,
 			);
 			path = ViewController;
 			sourceTree = "<group>";
@@ -171,6 +174,7 @@
 				9CCCBE662A0556B30004E7AC /* ViewController.swift in Sources */,
 				9CCCBE622A0556B30004E7AC /* AppDelegate.swift in Sources */,
 				9CCCBE642A0556B30004E7AC /* SceneDelegate.swift in Sources */,
+				9CCCBE942A0927150004E7AC /* DetailViewController.swift in Sources */,
 				9CCCBE8B2A08FF400004E7AC /* Repository.swift in Sources */,
 				9CCCBE6C2A0556B30004E7AC /* GitHubSearcher.xcdatamodeld in Sources */,
 			);
