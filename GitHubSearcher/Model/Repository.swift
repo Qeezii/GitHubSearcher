@@ -20,13 +20,13 @@ struct RepositoryResponse: Codable {
 }
 
 struct Repository: Codable {
-    let name: String
+    let id: Int
     let fullName: String
     var owner: Owner
     let description: String?
 
     enum CodingKeys: String, CodingKey {
-        case name
+        case id
         case fullName = "full_name"
         case owner
         case description

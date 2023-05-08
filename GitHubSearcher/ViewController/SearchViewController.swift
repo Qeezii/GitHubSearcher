@@ -1,5 +1,5 @@
 //
-//  ViewController.swift
+//  SearchViewController.swift
 //  GitHubSearcher
 //
 //  Created by Alexey Poletaev on 05.05.2023.
@@ -9,7 +9,7 @@ import UIKit
 import SnapKit
 import Alamofire
 
-class ViewController: UIViewController {
+class SearchViewController: UIViewController {
 
     private var repositories: [Repository] = []
 
@@ -20,6 +20,7 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
+        title = "Search repositories"
         configureUIElements()
     }
 
@@ -45,7 +46,7 @@ class ViewController: UIViewController {
 
         view.addSubview(searchTextField)
         searchTextField.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(50)
+            make.top.equalTo(view.safeAreaLayoutGuide.snp.top)
             make.leading.equalToSuperview().offset(25)
             make.trailing.equalToSuperview().offset(-25)
             make.height.equalTo(35)
@@ -61,7 +62,7 @@ class ViewController: UIViewController {
             make.top.equalTo(searchTextField.snp.bottom).offset(25)
             make.leading.equalToSuperview()
             make.trailing.equalToSuperview()
-            make.bottom.equalToSuperview()
+            make.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom)
         }
     }
     private func configureActivityIndicatorView() {
@@ -94,7 +95,7 @@ class ViewController: UIViewController {
     }
 }
 
-extension ViewController: UITextFieldDelegate {
+extension SearchViewController: UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
         searchRepository()
@@ -102,20 +103,19 @@ extension ViewController: UITextFieldDelegate {
     }
 }
 
-extension ViewController: UITableViewDataSource {
+extension SearchViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return repositories.count
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let repository = repositories[indexPath.row]
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
-        cell.textLabel?.text = repository.fullName
+        cell.textLabel?.text = repositories[indexPath.row].fullName
         return cell
     }
 }
 
-extension ViewController: UITableViewDelegate {
+extension SearchViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let repository = repositories[indexPath.row]
         let detailVC = DetailViewController(repository: repository)

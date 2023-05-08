@@ -49,7 +49,7 @@ class DetailViewController: UIViewController {
 
         view.addSubview(repoFullNameLabel)
         repoFullNameLabel.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(80)
+            make.top.equalTo(view.safeAreaLayoutGuide.snp.top)
             make.leading.equalToSuperview().offset(leadingConstraints)
             make.trailing.equalToSuperview().offset(trailingConstraints)
         }
@@ -92,10 +92,16 @@ class DetailViewController: UIViewController {
     private func configureFavoriteButton() {
         favoriteButton.setTitle("Add to favorites", for: .normal)
         favoriteButton.setTitle("Delete from favorites", for: .selected)
+        favoriteButton.isSelected = CoreDataManager.shared.isFavorite(repository.id)
         favoriteButton.backgroundColor = .blue
         favoriteButton.layer.cornerRadius = 10
         favoriteButton.addAction(UIAction(handler: { _ in
             self.favoriteButton.isSelected.toggle()
+            if self.favoriteButton.isSelected {
+                CoreDataManager.shared.addFavorite(self.repository)
+            } else {
+                CoreDataManager.shared.removeFavorite(self.repository.id)
+            }
         }), for: .touchUpInside)
 
         view.addSubview(favoriteButton)
@@ -117,11 +123,9 @@ class DetailViewController: UIViewController {
                 self.repository.owner = owner
                 DispatchQueue.main.async {
                     if let name = owner.name {
-                        print("name:", name)
                         self.repoOwnerNameLabel.text = "Owner name: \(name)"
                     }
                     if let email = owner.email {
-                        print("email:", email)
                         self.repoOwnerEmailLabel.text = "Owner e-mail \(email)"
                     }
                 }
