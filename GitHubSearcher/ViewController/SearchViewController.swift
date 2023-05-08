@@ -75,18 +75,16 @@ class SearchViewController: UIViewController {
         }
     }
     private func searchRepository() {
-        activityIndicatorView.startAnimating()
         guard let query = searchTextField.text else { return }
-        guard let url = URL(string: "https://api.github.com/search/repositories?q=\(query)") else { return }
-
-        AF.request(url).responseDecodable(of: RepositoryResponse.self) { response in
-            switch response.result {
+        activityIndicatorView.startAnimating()
+        NetworkManager.shared.fetchRepository(query: query) { [weak self] result in
+            guard let strongSelf = self else { return }
+            switch result {
             case .success(let searchResponse):
-                self.repositories = searchResponse.items
-                
+                strongSelf.repositories = searchResponse.items
                 DispatchQueue.main.async {
-                    self.activityIndicatorView.stopAnimating()
-                    self.repositoryTableView.reloadData()
+                    strongSelf.activityIndicatorView.stopAnimating()
+                    strongSelf.repositoryTableView.reloadData()
                 }
             case .failure(let error):
                 print(error.localizedDescription)

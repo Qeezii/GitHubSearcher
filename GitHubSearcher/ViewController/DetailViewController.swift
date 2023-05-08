@@ -10,9 +10,28 @@ import SnapKit
 import Alamofire
 
 class DetailViewController: UIViewController {
+
     var repository: Repository
+
+    private var ownerName: String? {
+        didSet {
+            if let name = ownerName {
+                repoOwnerNameLabel.text = "Owner name: \(name)"
+            }
+        }
+    }
+    private var ownerEmail: String? {
+        didSet {
+            if let email = ownerEmail {
+                repoOwnerEmailLabel.text = "Owner email: \(email)"
+            }
+        }
+    }
+
     private let leadingConstraints = 25
     private let trailingConstraints = -25
+    private let spacingConstraints = 50
+
     private let favoriteButton = UIButton()
     private let repoFullNameLabel = UILabel()
     private let repoDescriptionLabel = UILabel()
@@ -62,7 +81,7 @@ class DetailViewController: UIViewController {
 
         view.addSubview(repoDescriptionLabel)
         repoDescriptionLabel.snp.makeConstraints { make in
-            make.top.equalTo(repoFullNameLabel.snp.bottom).offset(50)
+            make.top.equalTo(repoFullNameLabel.snp.bottom).offset(spacingConstraints)
             make.leading.equalToSuperview().offset(leadingConstraints)
             make.trailing.equalToSuperview().offset(trailingConstraints)
         }
@@ -84,7 +103,7 @@ class DetailViewController: UIViewController {
 
         view.addSubview(repoOwnerEmailLabel)
         repoOwnerEmailLabel.snp.makeConstraints { make in
-            make.top.equalTo(repoOwnerNameLabel.snp.bottom).offset(25)
+            make.top.equalTo(repoOwnerNameLabel.snp.bottom).offset(spacingConstraints / 2)
             make.leading.equalToSuperview().offset(leadingConstraints)
             make.trailing.equalToSuperview().offset(trailingConstraints)
         }
@@ -106,7 +125,7 @@ class DetailViewController: UIViewController {
 
         view.addSubview(favoriteButton)
         favoriteButton.snp.makeConstraints { make in
-            make.top.equalTo(repoOwnerEmailLabel.snp.bottom).offset(50)
+            make.top.equalTo(repoOwnerEmailLabel.snp.bottom).offset(spacingConstraints)
             make.leading.equalToSuperview().offset(leadingConstraints)
             make.trailing.equalToSuperview().offset(trailingConstraints)
             make.height.equalTo(35)
@@ -114,20 +133,14 @@ class DetailViewController: UIViewController {
     }
 
     private func loadOwnerData() {
-        let query = repository.owner.login
-        guard let url = URL(string: "https://api.github.com/users/\(query)") else { return }
-
-        AF.request(url).responseDecodable(of: Owner.self) { response in
-            switch response.result {
+        NetworkManager.shared.fetchOwnerData(for: repository) { [weak self] result in
+            guard let strongSelf = self else { return }
+            switch result {
             case .success(let owner):
-                self.repository.owner = owner
+                strongSelf.repository.owner = owner
                 DispatchQueue.main.async {
-                    if let name = owner.name {
-                        self.repoOwnerNameLabel.text = "Owner name: \(name)"
-                    }
-                    if let email = owner.email {
-                        self.repoOwnerEmailLabel.text = "Owner e-mail \(email)"
-                    }
+                    strongSelf.ownerName = owner.name
+                    strongSelf.ownerEmail = owner.email
                 }
             case .failure(let error):
                 print(error.localizedDescription)

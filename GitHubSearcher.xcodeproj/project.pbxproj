@@ -22,6 +22,7 @@
 		9CCCBEA32A095A8F0004E7AC /* RepositoryEntity+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CCCBEA12A095A8F0004E7AC /* RepositoryEntity+CoreDataClass.swift */; };
 		9CCCBEA42A095A8F0004E7AC /* RepositoryEntity+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CCCBEA22A095A8F0004E7AC /* RepositoryEntity+CoreDataProperties.swift */; };
 		9CCCBEA62A095BC50004E7AC /* MainTabBarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CCCBEA52A095BC50004E7AC /* MainTabBarViewController.swift */; };
+		9CCCBEA82A096BC50004E7AC /* NetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CCCBEA72A096BC50004E7AC /* NetworkManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -40,6 +41,7 @@
 		9CCCBEA12A095A8F0004E7AC /* RepositoryEntity+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RepositoryEntity+CoreDataClass.swift"; sourceTree = "<group>"; };
 		9CCCBEA22A095A8F0004E7AC /* RepositoryEntity+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RepositoryEntity+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		9CCCBEA52A095BC50004E7AC /* MainTabBarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabBarViewController.swift; sourceTree = "<group>"; };
+		9CCCBEA72A096BC50004E7AC /* NetworkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -112,6 +114,7 @@
 			isa = PBXGroup;
 			children = (
 				9CCCBE9D2A094E370004E7AC /* CoreDataManager.swift */,
+				9CCCBEA72A096BC50004E7AC /* NetworkManager.swift */,
 			);
 			path = Service;
 			sourceTree = "<group>";
@@ -194,6 +197,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9CCCBEA82A096BC50004E7AC /* NetworkManager.swift in Sources */,
 				9CCCBEA42A095A8F0004E7AC /* RepositoryEntity+CoreDataProperties.swift in Sources */,
 				9CCCBE662A0556B30004E7AC /* SearchViewController.swift in Sources */,
 				9CCCBE622A0556B30004E7AC /* AppDelegate.swift in Sources */,

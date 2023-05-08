@@ -12,13 +12,18 @@ class FavoritesViewConroller: UIViewController {
 
     private var favorites: [RepositoryEntity] = []
     private let favoriteTableView = UITableView()
+    private let refreshControl = UIRefreshControl()
 
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
         title = "Favorites repositories"
-        favorites = CoreDataManager.shared.loadFavorites()
         configureFavoriteTableView()
+    }
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        update()
     }
 
     private func configureFavoriteTableView() {
@@ -27,6 +32,9 @@ class FavoritesViewConroller: UIViewController {
         favoriteTableView.dataSource = self
         favoriteTableView.delegate = self
 
+        refreshControl.addTarget(self, action: #selector(refresh(_:)), for: .valueChanged)
+        favoriteTableView.addSubview(refreshControl)
+
         view.addSubview(favoriteTableView)
         favoriteTableView.snp.makeConstraints { make in
             make.top.equalTo(view.safeAreaLayoutGuide.snp.top)
@@ -34,6 +42,15 @@ class FavoritesViewConroller: UIViewController {
             make.trailing.equalToSuperview()
             make.bottom.equalToSuperview()
         }
+    }
+    private func update() {
+        favorites = CoreDataManager.shared.loadFavorites()
+        favoriteTableView.reloadData()
+    }
+
+    @objc private func refresh(_ sender: UIRefreshControl) {
+        update()
+        sender.endRefreshing()
     }
 }
 
