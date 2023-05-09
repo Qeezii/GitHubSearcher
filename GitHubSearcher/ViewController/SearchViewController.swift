@@ -8,6 +8,13 @@
 import UIKit
 import SnapKit
 
+private enum Constraints: CGFloat {
+    case leading = 25
+    case trailing = -25
+    case verticalSpacing = 20
+    case height = 35
+}
+
 final class SearchViewController: UIViewController {
 
     // MARK: - Properties
@@ -18,7 +25,7 @@ final class SearchViewController: UIViewController {
     // MARK: - UI Elements
     private lazy var searchTextField: UITextField = {
         let textField = UITextField()
-        textField.placeholder = "Enter text..."
+        textField.placeholder = "Search"
         textField.addSpaceBeforeText()
         textField.layer.borderWidth = 1.5
         textField.layer.borderColor = UIColor.systemGray.cgColor
@@ -38,6 +45,19 @@ final class SearchViewController: UIViewController {
         activityIndicator.hidesWhenStopped = true
         return activityIndicator
     }()
+    private lazy var hintLabel: UILabel = {
+        let label = UILabel()
+        label.text = "Enter the text to search for repositories"
+        label.textAlignment = .center
+        label.textColor = .black
+        return label
+    }()
+    private lazy var searchEmptyImage: UIImageView = {
+        let imageView = UIImageView()
+        imageView.image = UIImage(named: "SearchEmpty")
+        imageView.isHidden = true
+        return imageView
+    }()
 
     // MARK: - Override funcs
     override func viewDidLoad() {
@@ -52,15 +72,17 @@ final class SearchViewController: UIViewController {
         configureSearchTextField()
         configureRepositoryTableView()
         configureActivityIndicatorView()
+        configureHintLabel()
+        configureSearchEmptyImage()
     }
     private func configureSearchTextField() {
         searchTextField.delegate = self
         view.addSubview(searchTextField)
         searchTextField.snp.makeConstraints { make in
             make.top.equalTo(view.safeAreaLayoutGuide.snp.top)
-            make.leading.equalToSuperview().offset(25)
-            make.trailing.equalToSuperview().offset(-25)
-            make.height.equalTo(35)
+            make.leading.equalToSuperview().offset(Constraints.leading.rawValue)
+            make.trailing.equalToSuperview().offset(Constraints.trailing.rawValue)
+            make.height.equalTo(Constraints.height.rawValue)
         }
     }
     private func configureRepositoryTableView() {
@@ -68,9 +90,9 @@ final class SearchViewController: UIViewController {
         repositoryTableView.delegate = self
         view.addSubview(repositoryTableView)
         repositoryTableView.snp.makeConstraints { make in
-            make.top.equalTo(searchTextField.snp.bottom).offset(25)
-            make.leading.equalToSuperview()
-            make.trailing.equalToSuperview()
+            make.top.equalTo(searchTextField.snp.bottom).offset(Constraints.verticalSpacing.rawValue)
+            make.leading.equalToSuperview().offset(Constraints.leading.rawValue / 2)
+            make.trailing.equalTo(searchTextField.snp.trailing)
             make.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom)
         }
     }
@@ -80,16 +102,41 @@ final class SearchViewController: UIViewController {
             make.center.equalToSuperview()
         }
     }
+    private func configureHintLabel() {
+        view.addSubview(hintLabel)
+        hintLabel.snp.makeConstraints { make in
+            make.top.equalTo(searchTextField.snp.bottom).offset(Constraints.verticalSpacing.rawValue)
+            make.leading.equalToSuperview().offset(Constraints.leading.rawValue)
+            make.trailing.equalToSuperview().offset(Constraints.trailing.rawValue)
+        }
+    }
+    private func configureSearchEmptyImage() {
+        view.addSubview(searchEmptyImage)
+        searchEmptyImage.snp.makeConstraints { make in
+            make.top.equalTo(hintLabel.snp.bottom).offset(Constraints.verticalSpacing.rawValue)
+            make.centerX.equalTo(view.snp.centerX)
+            make.width.height.equalTo(view.frame.width / 2)
+        }
+    }
+    private func successReponse() {
+        activityIndicatorView.stopAnimating()
+        repositoryTableView.reloadData()
+        guard repositories.isEmpty else { return }
+        searchEmptyImage.isHidden = false
+        hintLabel.isHidden = false
+        hintLabel.text = "Nothing found"
+    }
     private func searchRepositories() {
         guard let query = searchTextField.text else { return }
+        searchEmptyImage.isHidden = true
+        hintLabel.isHidden = true
         activityIndicatorView.startAnimating()
         NetworkManager.shared.fetchRepositories(query: query) { [weak self] result in
             guard let strongSelf = self else { return }
             switch result {
             case .success(let searchResponse):
                 strongSelf.repositories = searchResponse.items
-                strongSelf.activityIndicatorView.stopAnimating()
-                strongSelf.repositoryTableView.reloadData()
+                strongSelf.successReponse()
             case .failure(let error):
                 print(error.localizedDescription)
             }
