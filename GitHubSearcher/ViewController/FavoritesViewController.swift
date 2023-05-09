@@ -8,12 +8,31 @@
 import UIKit
 import SnapKit
 
+private enum Constraints: CGFloat {
+    case leading = 25
+    case trailing = -25
+}
+
 final class FavoritesViewConroller: UIViewController {
 
     // MARK: - Properties
     private var favorites: [RepositoryEntity] = []
     private let cellIdentifier = "FavoriteCell"
-    private let favoriteTableView = UITableView()
+
+    // MARK: - UI Elements
+    private lazy var favoriteTableView: UITableView = {
+        let tableView = UITableView()
+        tableView.register(UITableViewCell.self, forCellReuseIdentifier: cellIdentifier)
+        tableView.separatorStyle = .none
+        return tableView
+    }()
+    private lazy var emptyFavoritesLabel: UILabel = {
+        let label = UILabel()
+        label.text = "Nothing has been added to favorites"
+        label.textAlignment = .center
+        label.textColor = .black
+        return label
+    }()
     private let refreshControl = UIRefreshControl()
 
     // MARK: - Override funcs
@@ -21,7 +40,7 @@ final class FavoritesViewConroller: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = .white
         title = "Favorites repositories"
-        configureFavoriteTableView()
+        configureUIElements()
     }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -29,15 +48,16 @@ final class FavoritesViewConroller: UIViewController {
     }
 
     // MARK: - Methods
+    private func configureUIElements() {
+        configureFavoriteTableView()
+        configureEmptyFavoritesLabel()
+    }
     private func configureFavoriteTableView() {
-        favoriteTableView.register(UITableViewCell.self, forCellReuseIdentifier: cellIdentifier)
-        favoriteTableView.separatorStyle = .none
         favoriteTableView.dataSource = self
         favoriteTableView.delegate = self
-
         refreshControl.addTarget(self, action: #selector(refresh(_:)), for: .valueChanged)
-        favoriteTableView.addSubview(refreshControl)
 
+        favoriteTableView.addSubview(refreshControl)
         view.addSubview(favoriteTableView)
         favoriteTableView.snp.makeConstraints { make in
             make.top.equalTo(view.safeAreaLayoutGuide.snp.top)
@@ -46,8 +66,17 @@ final class FavoritesViewConroller: UIViewController {
             make.bottom.equalToSuperview()
         }
     }
+    private func configureEmptyFavoritesLabel() {
+        view.addSubview(emptyFavoritesLabel)
+        emptyFavoritesLabel.snp.makeConstraints { make in
+            make.leading.equalToSuperview().offset(Constraints.leading.rawValue)
+            make.trailing.equalToSuperview().offset(Constraints.trailing.rawValue)
+            make.centerY.equalTo(view.snp.centerY)
+        }
+    }
     private func update() {
         favorites = CoreDataManager.shared.loadFavorites()
+        emptyFavoritesLabel.isHidden = favorites.isEmpty ? false : true
         favoriteTableView.reloadData()
     }
     @objc private func refresh(_ sender: UIRefreshControl) {
