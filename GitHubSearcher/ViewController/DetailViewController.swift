@@ -7,39 +7,61 @@
 
 import UIKit
 import SnapKit
-import Alamofire
 
-class DetailViewController: UIViewController {
+private enum Constraints: CGFloat {
+    case leading = 25
+    case trailing = -25
+    case verticalSpacing = 50
+}
 
+final class DetailViewController: UIViewController {
+
+    // MARK: - Properties
     var repository: Repository
+    var fromFavoritesList: Bool
 
-    private var ownerName: String? {
-        didSet {
-            if let name = ownerName {
-                repoOwnerNameLabel.text = "Owner name: \(name)"
-            }
-        }
-    }
-    private var ownerEmail: String? {
-        didSet {
-            if let email = ownerEmail {
-                repoOwnerEmailLabel.text = "Owner email: \(email)"
-            }
-        }
-    }
+    // MARK: - UI Elements
+    private lazy var repoFullNameLabel: UILabel = {
+        let label = UILabel()
+        cofigureLabel(label, text: "Repository: \(repository.fullName)")
+        return label
+    }()
+    private lazy var repoDescriptionLabel: UILabel = {
+        let label = UILabel()
+        cofigureLabel(label, text: "Description: \(repository.description ?? "")")
+        return label
+    }()
+    private lazy var repoOwnerNameLabel: UILabel = {
+        let label = UILabel()
+        cofigureLabel(label, text: "Owner name: \(repository.owner.name ?? "")")
+        return label
+    }()
+    private lazy var repoOwnerEmailLabel: UILabel = {
+        let label = UILabel()
+        cofigureLabel(label, text: "Owner email: \(repository.owner.email ?? "")")
+        return label
+    }()
+    private lazy var favoriteButton: UIButton = {
+        let button = UIButton()
+        button.setTitle("Add to favorites", for: .normal)
+        button.setTitle("Delete from favorites", for: .selected)
+        button.isSelected = CoreDataManager.shared.isFavorite(repository.id)
+        button.backgroundColor = .blue
+        button.layer.cornerRadius = 10
+        button.addTarget(self, action: #selector(favoriteButtonIsPressed), for: .touchUpInside)
+        return button
+    }()
+    private lazy var activityIndicatorView: UIActivityIndicatorView = {
+        let activityIndicator = UIActivityIndicatorView()
+        activityIndicator.style = .large
+        activityIndicator.hidesWhenStopped = true
+        return activityIndicator
+    }()
 
-    private let leadingConstraints = 25
-    private let trailingConstraints = -25
-    private let spacingConstraints = 50
-
-    private let favoriteButton = UIButton()
-    private let repoFullNameLabel = UILabel()
-    private let repoDescriptionLabel = UILabel()
-    private let repoOwnerNameLabel = UILabel()
-    private let repoOwnerEmailLabel = UILabel()
-
-    init(repository: Repository) {
+    // MARK: - Init
+    init(repository: Repository, fromFavoritesList: Bool = false) {
         self.repository = repository
+        self.fromFavoritesList = fromFavoritesList
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -47,13 +69,19 @@ class DetailViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
 
+    // MARK: - Override funcs
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
-        loadOwnerData()
-        configureUIElements()
+        guard !fromFavoritesList else {
+            configureUIElements()
+            return
+        }
+        configureActivityIndicatorView()
+        loadOwner()
     }
 
+    // MARK: - Methods
     private func configureUIElements() {
         configureRepoFullNameLabel()
         configureRepoDescriptionLabel()
@@ -62,89 +90,80 @@ class DetailViewController: UIViewController {
         configureFavoriteButton()
     }
     private func configureRepoFullNameLabel() {
-        repoFullNameLabel.text = "Repository: \(repository.fullName)"
-        repoFullNameLabel.numberOfLines = 0
-        repoFullNameLabel.textColor = .black
-
         view.addSubview(repoFullNameLabel)
         repoFullNameLabel.snp.makeConstraints { make in
-            make.top.equalTo(view.safeAreaLayoutGuide.snp.top)
-            make.leading.equalToSuperview().offset(leadingConstraints)
-            make.trailing.equalToSuperview().offset(trailingConstraints)
+            make.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(Constraints.verticalSpacing.rawValue)
+            make.leading.equalToSuperview().offset(Constraints.leading.rawValue)
+            make.trailing.equalToSuperview().offset(Constraints.trailing.rawValue)
         }
     }
     private func configureRepoDescriptionLabel() {
-        guard let description = repository.description else { return }
-        repoDescriptionLabel.text = "Description: \(description)"
-        repoDescriptionLabel.numberOfLines = 0
-        repoDescriptionLabel.textColor = .black
-
+        guard repository.description != nil else { return }
         view.addSubview(repoDescriptionLabel)
         repoDescriptionLabel.snp.makeConstraints { make in
-            make.top.equalTo(repoFullNameLabel.snp.bottom).offset(spacingConstraints)
-            make.leading.equalToSuperview().offset(leadingConstraints)
-            make.trailing.equalToSuperview().offset(trailingConstraints)
+            make.top.equalTo(repoFullNameLabel.snp.bottom).offset(Constraints.verticalSpacing.rawValue)
+            make.leading.equalToSuperview().offset(Constraints.leading.rawValue)
+            make.trailing.equalToSuperview().offset(Constraints.trailing.rawValue)
         }
     }
     private func configureRepoOwnerNameLabel() {
-        repoOwnerNameLabel.textColor = .black
-
+        guard repository.owner.name != nil else { return }
         view.addSubview(repoOwnerNameLabel)
         repoOwnerNameLabel.snp.makeConstraints { make in
-            make.top.equalTo(
-                repository.description != nil ? repoDescriptionLabel.snp.bottom : repoFullNameLabel.snp.bottom
-            ).offset(50)
-            make.leading.equalToSuperview().offset(leadingConstraints)
-            make.trailing.equalToSuperview().offset(trailingConstraints)
+            make.top.equalTo(view.snp.centerY).offset(Constraints.verticalSpacing.rawValue)
+            make.leading.equalToSuperview().offset(Constraints.leading.rawValue)
+            make.trailing.equalToSuperview().offset(Constraints.trailing.rawValue)
         }
     }
     private func configureRepoOwnerEmailLabel() {
-        repoOwnerEmailLabel.textColor = .black
-
+        guard repository.owner.email != nil else { return }
         view.addSubview(repoOwnerEmailLabel)
         repoOwnerEmailLabel.snp.makeConstraints { make in
-            make.top.equalTo(repoOwnerNameLabel.snp.bottom).offset(spacingConstraints / 2)
-            make.leading.equalToSuperview().offset(leadingConstraints)
-            make.trailing.equalToSuperview().offset(trailingConstraints)
+            make.top.equalTo(repoOwnerNameLabel.snp.bottom).offset(Constraints.verticalSpacing.rawValue / 2)
+            make.leading.equalToSuperview().offset(Constraints.leading.rawValue)
+            make.trailing.equalToSuperview().offset(Constraints.trailing.rawValue)
         }
     }
     private func configureFavoriteButton() {
-        favoriteButton.setTitle("Add to favorites", for: .normal)
-        favoriteButton.setTitle("Delete from favorites", for: .selected)
-        favoriteButton.isSelected = CoreDataManager.shared.isFavorite(repository.id)
-        favoriteButton.backgroundColor = .blue
-        favoriteButton.layer.cornerRadius = 10
-        favoriteButton.addAction(UIAction(handler: { _ in
-            self.favoriteButton.isSelected.toggle()
-            if self.favoriteButton.isSelected {
-                CoreDataManager.shared.addFavorite(self.repository)
-            } else {
-                CoreDataManager.shared.removeFavorite(self.repository.id)
-            }
-        }), for: .touchUpInside)
-
         view.addSubview(favoriteButton)
         favoriteButton.snp.makeConstraints { make in
-            make.top.equalTo(repoOwnerEmailLabel.snp.bottom).offset(spacingConstraints)
-            make.leading.equalToSuperview().offset(leadingConstraints)
-            make.trailing.equalToSuperview().offset(trailingConstraints)
+            make.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom).offset(-Constraints.verticalSpacing.rawValue / 2)
+            make.leading.equalToSuperview().offset(Constraints.leading.rawValue)
+            make.trailing.equalToSuperview().offset(Constraints.trailing.rawValue)
             make.height.equalTo(35)
         }
     }
-
-    private func loadOwnerData() {
-        NetworkManager.shared.fetchOwnerData(for: repository) { [weak self] result in
+    private func configureActivityIndicatorView() {
+        activityIndicatorView.startAnimating()
+        view.addSubview(activityIndicatorView)
+        activityIndicatorView.snp.makeConstraints { make in
+            make.center.equalToSuperview()
+        }
+    }
+    private func cofigureLabel(_ label: UILabel, text: String) {
+        label.text = text
+        label.numberOfLines = 0
+        label.textColor = .black
+    }
+    private func loadOwner() {
+        NetworkManager.shared.fetchOwner(for: repository) { [weak self] result in
             guard let strongSelf = self else { return }
             switch result {
             case .success(let owner):
                 strongSelf.repository.owner = owner
-                DispatchQueue.main.async {
-                    strongSelf.ownerName = owner.name
-                    strongSelf.ownerEmail = owner.email
-                }
+                strongSelf.activityIndicatorView.stopAnimating()
+                strongSelf.configureUIElements()
             case .failure(let error):
                 print(error.localizedDescription)
             }
+        }
+    }
+    @objc private func favoriteButtonIsPressed() {
+        favoriteButton.isSelected.toggle()
+        if favoriteButton.isSelected {
+            CoreDataManager.shared.addFavorite(repository)
+        } else {
+            CoreDataManager.shared.removeFavorite(repository.id)
         }
     }
 }

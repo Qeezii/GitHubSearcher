@@ -16,35 +16,42 @@ final class NetworkManager {
 
     static let shared = NetworkManager()
 
-    private let apiRepositories = "https://api.github.com/search/repositories?q="
-    private let apiUsers = "https://api.github.com/users/"
-
     private init() {}
 
-    func fetchRepository(query: String, complition: @escaping (Result<RepositoryResponse, Error>) -> ()) {
-        guard let url = URL(string: "\(apiRepositories)\(query)") else {
-            complition(.failure(NetworkError.invalidURL))
+    /// Fetches repositories based on the provided query from the Github API.
+    /// - Parameters:
+    ///   - query: A `String` representing the search query.
+    ///   - completion: A completion handler that takes a `Result` object which contains either a `RepositoryResponse` object or an `Error`.
+    func fetchRepositories(query: String, completion: @escaping (Result<RepositoryResponse, Error>) -> ()) {
+        guard let url = API.apiForRepositories(query: query) else {
+            completion(.failure(NetworkError.invalidURL))
             return
         }
-
-        AF.request(url).responseDecodable(of: RepositoryResponse.self) { response in
+        AF.request(url)
+            .validate()
+            .responseDecodable(of: RepositoryResponse.self) { response in
             switch response.result {
             case .success(let searchResponse):
-                complition(.success(searchResponse))
+                completion(.success(searchResponse))
             case .failure(let error):
-                complition(.failure(error))
+                completion(.failure(error))
             }
         }
     }
 
-    func fetchOwnerData(for repository: Repository, completion: @escaping (Result<Owner, Error>) -> ()) {
-        let query = repository.owner.login
-        guard let url = URL(string: "\(apiUsers)\(query)") else {
+    /// Fetches the owner of a repository from the Github API
+    /// - Parameters:
+    ///   - repository: A `Repository` object whose owner is to be fetched.
+    ///   - completion: A completion handler that takes a `Result` object which contains either an `Owner` object or an `Error`.
+    func fetchOwner(for repository: Repository, completion: @escaping (Result<Owner, Error>) -> ()) {
+        let userName = repository.owner.login
+        guard let url = API.apiForUser(username: userName) else {
             completion(.failure(NetworkError.invalidURL))
             return
         }
-
-        AF.request(url).responseDecodable(of: Owner.self) { response in
+        AF.request(url)
+            .validate()
+            .responseDecodable(of: Owner.self) { response in
             switch response.result {
             case .success(let owner):
                 completion(.success(owner))

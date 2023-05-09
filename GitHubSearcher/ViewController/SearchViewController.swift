@@ -7,43 +7,54 @@
 
 import UIKit
 import SnapKit
-import Alamofire
 
-class SearchViewController: UIViewController {
+final class SearchViewController: UIViewController {
 
+    // MARK: - Properties
     private var repositories: [Repository] = []
+    private let cellIdentifier: String = "SearchCell"
+    private let mainTitle: String = "Search repositories"
 
-    private let searchTextField = UITextField()
-    private let repositoryTableView = UITableView()
-    private let activityIndicatorView = UIActivityIndicatorView()
+    // MARK: - UI Elements
+    private lazy var searchTextField: UITextField = {
+        let textField = UITextField()
+        textField.placeholder = "Enter text..."
+        textField.addSpaceBeforeText()
+        textField.layer.borderWidth = 1.5
+        textField.layer.borderColor = UIColor.systemGray.cgColor
+        textField.layer.cornerRadius = 10
+        textField.clearButtonMode = .whileEditing
+        textField.returnKeyType = .search
+        return textField
+    }()
+    private lazy var repositoryTableView: UITableView = {
+        let tableView = UITableView()
+        tableView.register(UITableViewCell.self, forCellReuseIdentifier: cellIdentifier)
+        return tableView
+    }()
+    private lazy var activityIndicatorView: UIActivityIndicatorView = {
+        let activityIndicator = UIActivityIndicatorView()
+        activityIndicator.style = .large
+        activityIndicator.hidesWhenStopped = true
+        return activityIndicator
+    }()
 
+    // MARK: - Override funcs
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
-        title = "Search repositories"
+        title = mainTitle
         configureUIElements()
     }
 
+    // MARK: - Methods
     private func configureUIElements() {
         configureSearchTextField()
         configureRepositoryTableView()
         configureActivityIndicatorView()
     }
     private func configureSearchTextField() {
-        searchTextField.placeholder = "  Enter text..."
         searchTextField.delegate = self
-        searchTextField.layer.borderWidth = 1.5
-        searchTextField.layer.borderColor = UIColor.systemGray.cgColor
-        searchTextField.layer.cornerRadius = 10
-
-        let searchButton = UIButton(type: .custom)
-        searchButton.setImage(UIImage(systemName: "magnifyingglass"), for: .normal)
-        searchButton.addAction(UIAction(handler: { _ in
-            let _ = self.textFieldShouldReturn(self.searchTextField)
-        }), for: .touchUpInside)
-        searchTextField.rightView = searchButton
-        searchTextField.rightViewMode = .whileEditing
-
         view.addSubview(searchTextField)
         searchTextField.snp.makeConstraints { make in
             make.top.equalTo(view.safeAreaLayoutGuide.snp.top)
@@ -53,10 +64,8 @@ class SearchViewController: UIViewController {
         }
     }
     private func configureRepositoryTableView() {
-        repositoryTableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
         repositoryTableView.dataSource = self
         repositoryTableView.delegate = self
-
         view.addSubview(repositoryTableView)
         repositoryTableView.snp.makeConstraints { make in
             make.top.equalTo(searchTextField.snp.bottom).offset(25)
@@ -66,26 +75,21 @@ class SearchViewController: UIViewController {
         }
     }
     private func configureActivityIndicatorView() {
-        activityIndicatorView.style = .large
-        activityIndicatorView.hidesWhenStopped = true
-
         view.addSubview(activityIndicatorView)
         activityIndicatorView.snp.makeConstraints { make in
             make.center.equalToSuperview()
         }
     }
-    private func searchRepository() {
+    private func searchRepositories() {
         guard let query = searchTextField.text else { return }
         activityIndicatorView.startAnimating()
-        NetworkManager.shared.fetchRepository(query: query) { [weak self] result in
+        NetworkManager.shared.fetchRepositories(query: query) { [weak self] result in
             guard let strongSelf = self else { return }
             switch result {
             case .success(let searchResponse):
                 strongSelf.repositories = searchResponse.items
-                DispatchQueue.main.async {
-                    strongSelf.activityIndicatorView.stopAnimating()
-                    strongSelf.repositoryTableView.reloadData()
-                }
+                strongSelf.activityIndicatorView.stopAnimating()
+                strongSelf.repositoryTableView.reloadData()
             case .failure(let error):
                 print(error.localizedDescription)
             }
@@ -93,26 +97,31 @@ class SearchViewController: UIViewController {
     }
 }
 
+// MARK: - UITextFieldDelegate
 extension SearchViewController: UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
-        searchRepository()
+        guard let text = searchTextField.text,
+              !text.isEmpty else { return true }
+        searchRepositories()
         return true
     }
 }
 
+// MARK: - UITableViewDataSource
 extension SearchViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return repositories.count
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
+        let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath)
         cell.textLabel?.text = repositories[indexPath.row].fullName
         return cell
     }
 }
 
+// MARK: - UITableViewDelegate
 extension SearchViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let repository = repositories[indexPath.row]
