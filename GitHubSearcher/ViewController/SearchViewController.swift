@@ -57,6 +57,13 @@ final class SearchViewController: UIViewController {
         imageView.isHidden = true
         return imageView
     }()
+    private lazy var swipeDownRecognizer: UISwipeGestureRecognizer = {
+        let recognizer = UISwipeGestureRecognizer()
+        recognizer.addTarget(self, action: #selector(hideKeyboardOnSwipeDown))
+        recognizer.delegate = self
+        recognizer.direction = UISwipeGestureRecognizer.Direction.down
+        return recognizer
+    }()
 
     // MARK: - Override funcs
     override func viewDidLoad() {
@@ -92,6 +99,7 @@ final class SearchViewController: UIViewController {
         repositoryTableView.delegate = self
         repositoryTableView.register(UITableViewCell.self,
                                      forCellReuseIdentifier: AppConstants.Strings.SearchScreen.cellIdentifier)
+        repositoryTableView.addGestureRecognizer(swipeDownRecognizer)
         view.addSubview(repositoryTableView)
         repositoryTableView.snp.makeConstraints {
             $0.top.equalTo(searchTextField.snp.bottom).offset(AppConstants.Constraints.verticalSpacing)
@@ -148,6 +156,9 @@ final class SearchViewController: UIViewController {
             }
         }
     }
+    @objc private func hideKeyboardOnSwipeDown() {
+        view.endEditing(true)
+    }
 }
 
 // MARK: - UITextFieldDelegate
@@ -181,5 +192,12 @@ extension SearchViewController: UITableViewDelegate {
         let repository = repositories[indexPath.row]
         let detailVC = DetailViewController(repository: repository)
         navigationController?.pushViewController(detailVC, animated: true)
+    }
+}
+
+// MARK: - UIGestureRecognizerDelegate
+extension SearchViewController: UIGestureRecognizerDelegate {
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+        true
     }
 }
