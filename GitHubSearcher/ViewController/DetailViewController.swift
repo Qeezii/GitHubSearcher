@@ -95,8 +95,8 @@ final class DetailViewController: UIViewController {
         view.addSubview(repoFullNameLabel)
         repoFullNameLabel.snp.makeConstraints {
             $0.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(AppConstants.Constraints.verticalSpacing)
-            $0.leading.equalToSuperview().offset(AppConstants.Constraints.leading)
-            $0.trailing.equalToSuperview().inset(AppConstants.Constraints.trailing)
+            $0.leading.equalToSuperview().offset(AppConstants.Constraints.leadingLarge)
+            $0.trailing.equalToSuperview().inset(AppConstants.Constraints.trailingLarge)
         }
     }
     private func configureRepoDescriptionLabel() {
@@ -104,8 +104,8 @@ final class DetailViewController: UIViewController {
         view.addSubview(repoDescriptionLabel)
         repoDescriptionLabel.snp.makeConstraints {
             $0.top.equalTo(repoFullNameLabel.snp.bottom).offset(AppConstants.Constraints.verticalSpacing)
-            $0.leading.equalToSuperview().offset(AppConstants.Constraints.leading)
-            $0.trailing.equalToSuperview().inset(AppConstants.Constraints.trailing)
+            $0.leading.equalToSuperview().offset(AppConstants.Constraints.leadingLarge)
+            $0.trailing.equalToSuperview().inset(AppConstants.Constraints.trailingLarge)
         }
     }
     private func configureRepoOwnerNameLabel() {
@@ -113,8 +113,8 @@ final class DetailViewController: UIViewController {
         view.addSubview(repoOwnerNameLabel)
         repoOwnerNameLabel.snp.makeConstraints {
             $0.top.equalTo(view.snp.centerY).offset(AppConstants.Constraints.verticalSpacing)
-            $0.leading.equalToSuperview().offset(AppConstants.Constraints.leading)
-            $0.trailing.equalToSuperview().inset(AppConstants.Constraints.trailing)
+            $0.leading.equalToSuperview().offset(AppConstants.Constraints.leadingLarge)
+            $0.trailing.equalToSuperview().inset(AppConstants.Constraints.trailingLarge)
         }
     }
     private func configureRepoOwnerEmailLabel() {
@@ -122,16 +122,16 @@ final class DetailViewController: UIViewController {
         view.addSubview(repoOwnerEmailLabel)
         repoOwnerEmailLabel.snp.makeConstraints {
             $0.top.equalTo(repoOwnerNameLabel.snp.bottom).offset(AppConstants.Constraints.verticalSpacing)
-            $0.leading.equalToSuperview().offset(AppConstants.Constraints.leading)
-            $0.trailing.equalToSuperview().inset(AppConstants.Constraints.trailing)
+            $0.leading.equalToSuperview().offset(AppConstants.Constraints.leadingLarge)
+            $0.trailing.equalToSuperview().inset(AppConstants.Constraints.trailingLarge)
         }
     }
     private func configureFavoriteButton() {
         view.addSubview(favoriteButton)
         favoriteButton.snp.makeConstraints {
             $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom).inset(AppConstants.Constraints.verticalSpacing)
-            $0.leading.equalToSuperview().offset(AppConstants.Constraints.leading)
-            $0.trailing.equalToSuperview().inset(AppConstants.Constraints.trailing)
+            $0.leading.equalToSuperview().offset(AppConstants.Constraints.leadingLarge)
+            $0.trailing.equalToSuperview().inset(AppConstants.Constraints.trailingLarge)
             $0.height.equalTo(AppConstants.Constraints.height)
         }
     }

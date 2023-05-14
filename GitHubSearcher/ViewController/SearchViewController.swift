@@ -36,6 +36,7 @@ final class SearchViewController: UIViewController {
     private let repositoryTableView: UITableView = {
         let tableView = UITableView()
         tableView.showsVerticalScrollIndicator = false
+        tableView.separatorInset = UIEdgeInsets.zero
         return tableView
     }()
     private let activityIndicatorView: UIActivityIndicatorView = {
@@ -89,22 +90,22 @@ final class SearchViewController: UIViewController {
         view.addSubview(searchTextField)
         searchTextField.snp.makeConstraints {
             $0.top.equalTo(view.safeAreaLayoutGuide.snp.top)
-            $0.leading.equalToSuperview().offset(AppConstants.Constraints.leading)
-            $0.trailing.equalToSuperview().inset(AppConstants.Constraints.trailing)
+            $0.leading.equalToSuperview().offset(AppConstants.Constraints.leadingLarge)
+            $0.trailing.equalToSuperview().inset(AppConstants.Constraints.trailingLarge)
             $0.height.equalTo(AppConstants.Constraints.height)
         }
     }
     private func configureRepositoryTableView() {
         repositoryTableView.dataSource = self
         repositoryTableView.delegate = self
-        repositoryTableView.register(UITableViewCell.self,
+        repositoryTableView.register(RepositoryTableViewCell.self,
                                      forCellReuseIdentifier: AppConstants.Strings.SearchScreen.cellIdentifier)
         repositoryTableView.addGestureRecognizer(swipeDownRecognizer)
         view.addSubview(repositoryTableView)
         repositoryTableView.snp.makeConstraints {
             $0.top.equalTo(searchTextField.snp.bottom).offset(AppConstants.Constraints.verticalSpacing)
-            $0.leading.equalToSuperview()
-            $0.trailing.equalToSuperview()
+            $0.leading.equalTo(searchTextField.snp.leading)
+            $0.trailing.equalTo(searchTextField.snp.trailing)
             $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom)
         }
     }
@@ -118,8 +119,8 @@ final class SearchViewController: UIViewController {
         view.addSubview(hintLabel)
         hintLabel.snp.makeConstraints {
             $0.top.equalTo(searchTextField.snp.bottom).offset(AppConstants.Constraints.verticalSpacing)
-            $0.leading.equalToSuperview().offset(AppConstants.Constraints.leading)
-            $0.trailing.equalToSuperview().inset(AppConstants.Constraints.trailing)
+            $0.leading.equalToSuperview().offset(AppConstants.Constraints.leadingLarge)
+            $0.trailing.equalToSuperview().inset(AppConstants.Constraints.trailingLarge)
         }
     }
     private func configureSearchEmptyImage() {
@@ -180,9 +181,15 @@ extension SearchViewController: UITableViewDataSource {
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: AppConstants.Strings.SearchScreen.cellIdentifier,
-                                                 for: indexPath)
-        cell.textLabel?.text = repositories[indexPath.row].fullName
-        return cell
+                                                 for: indexPath) as? RepositoryTableViewCell
+        switch cell {
+        case .none:
+            return UITableViewCell()
+        case .some(let cellUnwrap):
+            let fullName = repositories[indexPath.row].fullName
+            cellUnwrap.setupFullName(fullName)
+            return cellUnwrap
+        }
     }
 }
 

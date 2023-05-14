@@ -52,23 +52,23 @@ final class FavoritesViewConroller: UIViewController {
     private func configureFavoriteTableView() {
         favoriteTableView.dataSource = self
         favoriteTableView.delegate = self
-        favoriteTableView.register(UITableViewCell.self,
+        favoriteTableView.register(RepositoryTableViewCell.self,
                            forCellReuseIdentifier: AppConstants.Strings.FavoritesScreen.cellIdentifier)
         refreshControl.addTarget(self, action: #selector(refresh(_:)), for: .valueChanged)
         favoriteTableView.addSubview(refreshControl)
         view.addSubview(favoriteTableView)
         favoriteTableView.snp.makeConstraints {
             $0.top.equalTo(view.safeAreaLayoutGuide.snp.top)
-            $0.leading.equalToSuperview()
-            $0.trailing.equalToSuperview()
-            $0.bottom.equalToSuperview()
+            $0.leading.equalToSuperview().offset(AppConstants.Constraints.leadingLarge)
+            $0.trailing.equalToSuperview().inset(AppConstants.Constraints.trailingLarge)
+            $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom)
         }
     }
     private func configureEmptyFavoritesLabel() {
         view.addSubview(emptyFavoritesLabel)
         emptyFavoritesLabel.snp.makeConstraints {
-            $0.leading.equalToSuperview().offset(AppConstants.Constraints.leading)
-            $0.trailing.equalToSuperview().inset(AppConstants.Constraints.trailing)
+            $0.leading.equalToSuperview().offset(AppConstants.Constraints.leadingLarge)
+            $0.trailing.equalToSuperview().inset(AppConstants.Constraints.trailingLarge)
             $0.centerY.equalTo(view.snp.centerY)
         }
     }
@@ -91,9 +91,15 @@ extension FavoritesViewConroller: UITableViewDataSource {
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: AppConstants.Strings.FavoritesScreen.cellIdentifier,
-                                                 for: indexPath)
-        cell.textLabel?.text = favorites[indexPath.row].fullName
-        return cell
+                                                 for: indexPath) as? RepositoryTableViewCell
+        switch cell {
+        case .none:
+            return UITableViewCell()
+        case .some(let cellUnwrap):
+            let fullName = favorites[indexPath.row].fullName
+            cellUnwrap.setupFullName(fullName)
+            return cellUnwrap
+        }
     }
 }
 

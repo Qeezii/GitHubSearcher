@@ -28,7 +28,7 @@ struct AppConstants {
 
         struct SearchScreen {
             static let title = "Search repositories"
-            static let cellIdentifier = "SearchCell"
+            static let cellIdentifier = "SearchRepositoryTableViewCell"
             static let searchTextFieldPlaceholder = "Search"
             static let hintLabelTextDefault = "Enter the text to search for repositories"
             static let hintLabelTextNothingFound = "Nothing found"
@@ -52,7 +52,7 @@ struct AppConstants {
         }
         struct FavoritesScreen {
             static let title = "Favorites repositories"
-            static let cellIdentifier = "FavoriteCell"
+            static let cellIdentifier = "FavoriteRepositoryTableViewCell"
             static let emptyFavoritesLabelText = "Nothing has been added to favorites"
         }
         struct CoreData {
@@ -61,8 +61,14 @@ struct AppConstants {
     }
 
     struct Constraints {
-        static let leading: CGFloat = 24
-        static let trailing: CGFloat = 24
+        static let leadingLarge: CGFloat = 24
+        static let leadingMiddle: CGFloat = 16
+        static let leadingSmall: CGFloat = 8
+
+        static let trailingLarge: CGFloat = 24
+        static let trailingMiddle: CGFloat = 16
+        static let trailingSmall: CGFloat = 8
+
         static let verticalSpacing: CGFloat = 16
         static let height: CGFloat = 32
     }
