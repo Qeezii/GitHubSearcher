@@ -1,5 +1,5 @@
 //
-//  RepositoryResponse.swift
+//  RepositoryListResponse.swift
 //  GitHubSearcher
 //
 //  Created by Alexey Poletaev on 08.05.2023.
@@ -7,10 +7,10 @@
 
 import Foundation
 
-struct RepositoryResponse: Codable {
+struct RepositoryListResponse: Codable {
     let totalCount: Int
     let incompleteResults: Bool
-    let items: [Repository]
+    let items: [RepositoryResponse]
 
     enum CodingKeys: String, CodingKey {
         case totalCount = "total_count"
@@ -19,10 +19,10 @@ struct RepositoryResponse: Codable {
     }
 }
 
-struct Repository: Codable {
+struct RepositoryResponse: Codable {
     let id: Int
     let fullName: String
-    var owner: Owner
+    var owner: OwnerResponse
     let description: String?
 
     enum CodingKeys: String, CodingKey {
@@ -33,15 +33,9 @@ struct Repository: Codable {
     }
 }
 
-struct Owner: Codable {
+struct OwnerResponse: Codable {
     let login: String
     let name: String?
     let email: String?
-
-    enum CodingKeys: String, CodingKey {
-        case login
-        case name
-        case email
-    }
 }
 

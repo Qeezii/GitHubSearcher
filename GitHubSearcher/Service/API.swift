@@ -12,19 +12,22 @@ struct API {
     /// Returns the URL for searching repositories on GitHub.
     static func apiForRepositories(query: String) -> URL? {
         var components = URLComponents()
-        components.scheme = "https"
-        components.host = "api.github.com"
-        components.path = "/search/repositories"
-        components.queryItems = [URLQueryItem(name: "q", value: query)]
+        components.scheme = AppConstants.Strings.Network.scheme
+        components.host = AppConstants.Strings.Network.host
+        components.path = AppConstants.Strings.Network.SearchRepositories.path
+        components.queryItems = [
+            URLQueryItem(name: AppConstants.Strings.Network.SearchRepositories.queryItemName,
+                         value: query)
+        ]
         return components.url
     }
 
     /// Returns the URL  for getting information about a user on GitHub.
-    static func apiForUser(username: String) -> URL? {
+    static func apiForUser(userName: String) -> URL? {
         var components = URLComponents()
-        components.scheme = "https"
-        components.host = "api.github.com"
-        components.path = "/users/\(username)"
+        components.scheme = AppConstants.Strings.Network.scheme
+        components.host = AppConstants.Strings.Network.host
+        components.path = AppConstants.Strings.Network.OwnerInfo.path(userName: userName)
         return components.url
     }
 }

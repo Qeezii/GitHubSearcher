@@ -8,27 +8,21 @@
 import UIKit
 import SnapKit
 
-private enum Constraints: CGFloat {
-    case leading = 25
-    case trailing = -25
-}
-
 final class FavoritesViewConroller: UIViewController {
 
     // MARK: - Properties
     private var favorites: [RepositoryEntity] = []
-    private let cellIdentifier = "FavoriteCell"
 
     // MARK: - UI Elements
-    private lazy var favoriteTableView: UITableView = {
+    private let favoriteTableView: UITableView = {
         let tableView = UITableView()
-        tableView.register(UITableViewCell.self, forCellReuseIdentifier: cellIdentifier)
+        tableView.showsVerticalScrollIndicator = false
         tableView.separatorStyle = .none
         return tableView
     }()
-    private lazy var emptyFavoritesLabel: UILabel = {
+    private let emptyFavoritesLabel: UILabel = {
         let label = UILabel()
-        label.text = "Nothing has been added to favorites"
+        label.text = AppConstants.Strings.FavoritesScreen.emptyFavoritesLabelText
         label.textAlignment = .center
         label.textColor = .black
         return label
@@ -38,8 +32,6 @@ final class FavoritesViewConroller: UIViewController {
     // MARK: - Override funcs
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .white
-        title = "Favorites repositories"
         configureUIElements()
     }
     override func viewWillAppear(_ animated: Bool) {
@@ -49,29 +41,35 @@ final class FavoritesViewConroller: UIViewController {
 
     // MARK: - Methods
     private func configureUIElements() {
+        congifureMainView()
         configureFavoriteTableView()
         configureEmptyFavoritesLabel()
+    }
+    private func congifureMainView() {
+        view.backgroundColor = .white
+        title = AppConstants.Strings.FavoritesScreen.title
     }
     private func configureFavoriteTableView() {
         favoriteTableView.dataSource = self
         favoriteTableView.delegate = self
+        favoriteTableView.register(UITableViewCell.self,
+                           forCellReuseIdentifier: AppConstants.Strings.FavoritesScreen.cellIdentifier)
         refreshControl.addTarget(self, action: #selector(refresh(_:)), for: .valueChanged)
-
         favoriteTableView.addSubview(refreshControl)
         view.addSubview(favoriteTableView)
-        favoriteTableView.snp.makeConstraints { make in
-            make.top.equalTo(view.safeAreaLayoutGuide.snp.top)
-            make.leading.equalToSuperview()
-            make.trailing.equalToSuperview()
-            make.bottom.equalToSuperview()
+        favoriteTableView.snp.makeConstraints {
+            $0.top.equalTo(view.safeAreaLayoutGuide.snp.top)
+            $0.leading.equalToSuperview()
+            $0.trailing.equalToSuperview()
+            $0.bottom.equalToSuperview()
         }
     }
     private func configureEmptyFavoritesLabel() {
         view.addSubview(emptyFavoritesLabel)
-        emptyFavoritesLabel.snp.makeConstraints { make in
-            make.leading.equalToSuperview().offset(Constraints.leading.rawValue)
-            make.trailing.equalToSuperview().offset(Constraints.trailing.rawValue)
-            make.centerY.equalTo(view.snp.centerY)
+        emptyFavoritesLabel.snp.makeConstraints {
+            $0.leading.equalToSuperview().offset(AppConstants.Constraints.leading)
+            $0.trailing.equalToSuperview().inset(AppConstants.Constraints.trailing)
+            $0.centerY.equalTo(view.snp.centerY)
         }
     }
     private func update() {
@@ -92,7 +90,8 @@ extension FavoritesViewConroller: UITableViewDataSource {
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath)
+        let cell = tableView.dequeueReusableCell(withIdentifier: AppConstants.Strings.FavoritesScreen.cellIdentifier,
+                                                 for: indexPath)
         cell.textLabel?.text = favorites[indexPath.row].fullName
         return cell
     }
@@ -100,16 +99,20 @@ extension FavoritesViewConroller: UITableViewDataSource {
 
 // MARK: - UITableViewDelegate
 extension FavoritesViewConroller: UITableViewDelegate {
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let favRepository = favorites[indexPath.row]
-        let repository = Repository(
+    private func getRepositoryFromCoreData(_ favRepository: RepositoryEntity) -> RepositoryResponse {
+        RepositoryResponse(
             id: Int(favRepository.repositoryID),
             fullName: favRepository.fullName,
-            owner: Owner(
+            owner: OwnerResponse(
                 login: favRepository.ownerLogin,
                 name: favRepository.ownerName,
                 email: favRepository.ownerEmail),
             description: favRepository.descrip)
+    }
+
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let favRepository = favorites[indexPath.row]
+        let repository = getRepositoryFromCoreData(favRepository)
 
         let detailVC = DetailViewController(repository: repository, fromFavoritesList: true)
         navigationController?.pushViewController(detailVC, animated: true)
