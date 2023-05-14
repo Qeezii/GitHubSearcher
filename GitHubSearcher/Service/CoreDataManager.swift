@@ -11,13 +11,21 @@ import CoreData
 final class CoreDataManager {
     
     static let shared = CoreDataManager()
-    private let viewContext = (UIApplication.shared.delegate as? AppDelegate)?.persistentContainer.viewContext
+    private lazy var persistentContainer: NSPersistentContainer = {
+        let container = NSPersistentContainer(name: AppConstants.Strings.CoreData.containerName)
+        container.loadPersistentStores { _, error in
+            if let error = error as NSError? {
+                fatalError("Unresolved error \(error), \(error.userInfo)")
+            }
+        }
+        return container
+    }()
+    private lazy var viewContext = persistentContainer.viewContext
 
     private init() {}
 
     /// Saves changes to the managed object context, if any changes exist.
     private func saveContext() {
-        guard let viewContext = viewContext else { return }
         if viewContext.hasChanges {
             do {
                 try viewContext.save()
@@ -33,17 +41,17 @@ final class CoreDataManager {
     func isFavorite(_ repositoryID: Int) -> Bool {
         let fetchRequest: NSFetchRequest<RepositoryEntity> = RepositoryEntity.fetchRequest()
         fetchRequest.predicate = NSPredicate(format: "repositoryID == %d", repositoryID)
-        if let result = try? viewContext?.fetch(fetchRequest) {
+        if let result = try? viewContext.fetch(fetchRequest) {
             return !result.isEmpty
         }
         return false
     }
 
+    // подумать как переделать логику для красоты
     /// Adds the given repository to the list of favorites.
     /// - Parameter repository: The repository to add.
-    func addFavorite(_ repository: Repository) {
-        if !isFavorite(repository.id),
-            let viewContext = viewContext {
+    func addFavorite(_ repository: RepositoryResponse) {
+        if !isFavorite(repository.id) {
             let favorite = RepositoryEntity(context: viewContext)
             favorite.repositoryID = Int64(repository.id)
             favorite.fullName = repository.fullName
@@ -60,9 +68,9 @@ final class CoreDataManager {
     func removeFavorite(_ repositoryID: Int) {
         let fetchRequest: NSFetchRequest<RepositoryEntity> = RepositoryEntity.fetchRequest()
         fetchRequest.predicate = NSPredicate(format: "repositoryID == %d", repositoryID)
-        if let result = try? viewContext?.fetch(fetchRequest),
+        if let result = try? viewContext.fetch(fetchRequest),
            let favorite = result.first {
-            viewContext?.delete(favorite)
+            viewContext.delete(favorite)
             saveContext()
         }
     }
@@ -70,7 +78,6 @@ final class CoreDataManager {
     /// Retrieves the list of favorite repositories from the managed object context.
     /// - Returns: An array of `RepositoryEntity` objects representing the favorite repositories.
     func loadFavorites() -> [RepositoryEntity] {
-        guard let viewContext = viewContext else { return [] }
         let fetchRequest: NSFetchRequest<RepositoryEntity> = RepositoryEntity.fetchRequest()
         do {
             let favoriteRepositories = try viewContext.fetch(fetchRequest)
