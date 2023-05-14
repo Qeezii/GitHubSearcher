@@ -14,6 +14,8 @@ final class SearchViewController: UIViewController {
 
     // MARK: - Properties
     private var repositories: [RepositoryResponse] = []
+    private var currentPage: Int = 1
+    private var isShowLoadingCell: Bool = false
 
     // MARK: - UI Elements
     private let searchTextField: UITextField = {
@@ -65,6 +67,12 @@ final class SearchViewController: UIViewController {
         recognizer.direction = UISwipeGestureRecognizer.Direction.down
         return recognizer
     }()
+    private let spinnerActivityIndicatorView: UIActivityIndicatorView = {
+        let activityIndicator = UIActivityIndicatorView()
+        activityIndicator.style = .medium
+        activityIndicator.startAnimating()
+        return activityIndicator
+    }()
 
     // MARK: - Override funcs
     override func viewDidLoad() {
@@ -100,6 +108,9 @@ final class SearchViewController: UIViewController {
         repositoryTableView.delegate = self
         repositoryTableView.register(RepositoryTableViewCell.self,
                                      forCellReuseIdentifier: AppConstants.Strings.SearchScreen.cellIdentifier)
+        repositoryTableView.tableFooterView = spinnerActivityIndicatorView
+        repositoryTableView.tableFooterView?.isHidden = true
+        spinnerActivityIndicatorView.frame = CGRect(x: 0, y: 0, width: repositoryTableView.bounds.width, height: 44)
         repositoryTableView.addGestureRecognizer(swipeDownRecognizer)
         view.addSubview(repositoryTableView)
         repositoryTableView.snp.makeConstraints {
@@ -144,7 +155,7 @@ final class SearchViewController: UIViewController {
         searchEmptyImageView.isHidden = true
         hintLabel.isHidden = true
         activityIndicatorView.startAnimating()
-        NetworkManager.shared.fetchRepositories(query: query) { [weak self] result in
+        NetworkManager.shared.fetchRepositories(query: query, page: currentPage) { [weak self] result in
             guard let strongSelf = self else { return }
             switch result {
             case .success(let searchResponse):
@@ -159,6 +170,25 @@ final class SearchViewController: UIViewController {
     }
     @objc private func hideKeyboardOnSwipeDown() {
         view.endEditing(true)
+    }
+    private func loadMoreRepositories() {
+        guard !isShowLoadingCell,
+              currentPage < 10 else { return }
+        repositoryTableView.tableFooterView?.isHidden = false
+        isShowLoadingCell.toggle()
+        currentPage += 1
+        guard let query = searchTextField.text else { return }
+        NetworkManager.shared.fetchRepositories(query: query, page: currentPage) { [weak self] result in
+            guard let self, case .success(let response) = result else { return }
+            let oldCount = self.repositories.count
+            DispatchQueue.main.async {
+                self.repositories.append(contentsOf: response.items)
+                let indexPaths = (oldCount ..< self.repositories.count).map { IndexPath(row: $0, section: 0) }
+                self.repositoryTableView.insertRows(at: indexPaths, with: .automatic)
+                self.isShowLoadingCell.toggle()
+                self.repositoryTableView.tableFooterView?.isHidden = true
+            }
+        }
     }
 }
 
@@ -199,6 +229,11 @@ extension SearchViewController: UITableViewDelegate {
         let repository = repositories[indexPath.row]
         let detailVC = DetailViewController(repository: repository)
         navigationController?.pushViewController(detailVC, animated: true)
+    }
+
+    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        guard indexPath.row == repositories.count - 1 else { return }
+        loadMoreRepositories()
     }
 }
 

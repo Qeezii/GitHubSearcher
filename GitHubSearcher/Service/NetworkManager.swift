@@ -22,8 +22,8 @@ final class NetworkManager {
     /// - Parameters:
     ///   - query: A `String` representing the search query.
     ///   - completion: A completion handler that takes a `Result` object which contains either a `RepositoryListResponse` object or an `Error`.
-    func fetchRepositories(query: String, completion: @escaping (Result<RepositoryListResponse, Error>) -> ()) {
-        guard let url = API.apiForRepositories(query: query) else {
+    func fetchRepositories(query: String, page: Int, completion: @escaping (Result<RepositoryListResponse, Error>) -> ()) {
+        guard let url = API.apiForRepositories(query: query, page: "\(page)") else {
             completion(.failure(NetworkError.invalidURL))
             return
         }

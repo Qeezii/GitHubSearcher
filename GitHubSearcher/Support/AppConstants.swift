@@ -16,7 +16,10 @@ struct AppConstants {
 
             struct SearchRepositories {
                 static let path = "/search/repositories"
-                static let queryItemName = "q"
+                static let queryQueryItems = "q"
+                static let perPageQueryItems = "per_page"
+                static let perPageValue = "100"
+                static let pageQueryItems = "page"
             }
 
             struct OwnerInfo {

@@ -10,14 +10,18 @@ import Foundation
 struct API {
 
     /// Returns the URL for searching repositories on GitHub.
-    static func apiForRepositories(query: String) -> URL? {
+    static func apiForRepositories(query: String, page: String) -> URL? {
         var components = URLComponents()
         components.scheme = AppConstants.Strings.Network.scheme
         components.host = AppConstants.Strings.Network.host
         components.path = AppConstants.Strings.Network.SearchRepositories.path
         components.queryItems = [
-            URLQueryItem(name: AppConstants.Strings.Network.SearchRepositories.queryItemName,
-                         value: query)
+            URLQueryItem(name: AppConstants.Strings.Network.SearchRepositories.queryQueryItems,
+                         value: query),
+            URLQueryItem(name: AppConstants.Strings.Network.SearchRepositories.perPageQueryItems,
+                         value: AppConstants.Strings.Network.SearchRepositories.perPageValue),
+            URLQueryItem(name: AppConstants.Strings.Network.SearchRepositories.pageQueryItems,
+                         value: page)
         ]
         return components.url
     }
