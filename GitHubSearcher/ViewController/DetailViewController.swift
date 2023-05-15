@@ -70,6 +70,7 @@ final class DetailViewController: UIViewController {
     // MARK: - Override funcs
     override func viewDidLoad() {
         super.viewDidLoad()
+        configureMainView()
         guard !fromFavoritesList else {
             configureUIElements()
             return
@@ -80,7 +81,6 @@ final class DetailViewController: UIViewController {
 
     // MARK: - Methods
     private func configureUIElements() {
-        configureMainView()
         configureRepoFullNameLabel()
         configureRepoDescriptionLabel()
         configureRepoOwnerNameLabel()
@@ -149,18 +149,28 @@ final class DetailViewController: UIViewController {
     }
     private func loadOwner() {
         NetworkManager.shared.fetchOwner(for: repository) { [weak self] result in
-            guard let strongSelf = self else { return }
+            guard let self else { return }
             switch result {
             case .success(let owner):
-                strongSelf.repository.owner = owner
                 DispatchQueue.main.async {
-                    strongSelf.activityIndicatorView.stopAnimating()
-                    strongSelf.configureUIElements()
+                    self.repository.owner = owner
+                    self.activityIndicatorView.stopAnimating()
+                    self.configureUIElements()
                 }
             case .failure(let error):
-                print(error.localizedDescription)
+                DispatchQueue.main.async {
+                    self.activityIndicatorView.stopAnimating()
+                    self.showErrorAlertWith(error.localizedDescription)
+                }
             }
         }
+    }
+    private func showErrorAlertWith(_ message: String) {
+        let alert = UIAlertController(title: "Error",
+                                      message: message,
+                                      preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        present(alert, animated: true)
     }
     @objc private func favoriteButtonIsPressed() {
         favoriteButton.isSelected.toggle()

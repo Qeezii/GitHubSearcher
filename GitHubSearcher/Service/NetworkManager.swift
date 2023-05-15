@@ -6,10 +6,10 @@
 //
 
 import Foundation
+import Network
 
 enum NetworkError: Error {
     case invalidURL
-    case invalidData
 }
 
 final class NetworkManager {
@@ -39,8 +39,8 @@ final class NetworkManager {
             do {
                 let usersData = try JSONDecoder().decode(RepositoryListResponse.self, from: data)
                 completion(.success(usersData))
-            } catch {
-                completion(.failure(NetworkError.invalidData))
+            } catch (let error) {
+                completion(.failure(error))
             }
         }.resume()
     }
@@ -67,8 +67,8 @@ final class NetworkManager {
             do {
                 let owner = try JSONDecoder().decode(OwnerResponse.self, from: data)
                 completion(.success(owner))
-            } catch {
-                completion(.failure(NetworkError.invalidData))
+            } catch (let error) {
+                completion(.failure(error))
             }
         }.resume()
     }

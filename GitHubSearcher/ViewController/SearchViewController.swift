@@ -50,6 +50,7 @@ final class SearchViewController: UIViewController {
     private let hintLabel: UILabel = {
         let label = UILabel()
         label.text = AppConstants.Strings.SearchScreen.hintLabelTextDefault
+        label.numberOfLines = 0
         label.textAlignment = .center
         label.textColor = .black
         return label
@@ -142,7 +143,7 @@ final class SearchViewController: UIViewController {
             $0.width.height.equalTo(view.snp.width).dividedBy(2)
         }
     }
-    private func successReponse() {
+    private func successResponse() {
         activityIndicatorView.stopAnimating()
         repositoryTableView.reloadData()
         guard repositories.isEmpty else { return }
@@ -150,26 +151,29 @@ final class SearchViewController: UIViewController {
         hintLabel.isHidden = false
         hintLabel.text = AppConstants.Strings.SearchScreen.hintLabelTextNothingFound
     }
+    private func errorResponse(message: String) {
+        activityIndicatorView.stopAnimating()
+        showErrorAlertWith(message)
+    }
     private func searchRepositories() {
         guard let query = searchTextField.text else { return }
         searchEmptyImageView.isHidden = true
         hintLabel.isHidden = true
         activityIndicatorView.startAnimating()
         NetworkManager.shared.fetchRepositories(query: query, page: currentPage) { [weak self] result in
-            guard let strongSelf = self else { return }
+            guard let self else { return }
             switch result {
             case .success(let searchResponse):
                 DispatchQueue.main.async {
-                    strongSelf.repositories = searchResponse.items
-                    strongSelf.successReponse()
+                    self.repositories = searchResponse.items
+                    self.successResponse()
                 }
             case .failure(let error):
-                print(error.localizedDescription)
+                DispatchQueue.main.async {
+                    self.errorResponse(message: error.localizedDescription)
+                }
             }
         }
-    }
-    @objc private func hideKeyboardOnSwipeDown() {
-        view.endEditing(true)
     }
     private func loadMoreRepositories() {
         guard !isShowLoadingCell,
@@ -189,6 +193,16 @@ final class SearchViewController: UIViewController {
                 self.repositoryTableView.tableFooterView?.isHidden = true
             }
         }
+    }
+    private func showErrorAlertWith(_ message: String) {
+        let alert = UIAlertController(title: "Error",
+                                      message: message,
+                                      preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        present(alert, animated: true)
+    }
+    @objc private func hideKeyboardOnSwipeDown() {
+        view.endEditing(true)
     }
 }
 
