@@ -8,7 +8,6 @@
 import UIKit
 import SnapKit
 
-// убрать все let и сделать let
 
 final class SearchViewController: UIViewController {
 
