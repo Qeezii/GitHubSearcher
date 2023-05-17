@@ -13,26 +13,15 @@ final class SearchViewController: UIViewController {
 
     // MARK: - Properties
     private var repositories: [RepositoryResponse] = []
+    private var searchText: String = ""
     private var currentPage: Int = 1
     private var isShowLoadingCell: Bool = false
 
     // MARK: - UI Elements
-    private let searchTextField: UITextField = {
-        let textField = UITextField()
-        textField.placeholder = AppConstants.Strings.SearchScreen.searchTextFieldPlaceholder
-
-        let leftView = UIView(frame: CGRect(x: 10, y: 0, width: 7, height: textField.bounds.height))
-        leftView.backgroundColor = .clear
-        textField.leftView = leftView
-        textField.leftViewMode = .always
-        textField.contentVerticalAlignment = .center
-
-        textField.layer.borderWidth = 1.5
-        textField.layer.borderColor = UIColor.systemGray.cgColor
-        textField.layer.cornerRadius = 10
-        textField.clearButtonMode = .whileEditing
-        textField.returnKeyType = .search
-        return textField
+    private let searchController: UISearchController = {
+        let searchController = UISearchController()
+        searchController.searchBar.placeholder = AppConstants.Strings.SearchScreen.searchTextFieldPlaceholder
+        return searchController
     }()
     private let repositoryTableView: UITableView = {
         let tableView = UITableView()
@@ -83,7 +72,6 @@ final class SearchViewController: UIViewController {
     // MARK: - Methods
     private func configureUIElements() {
         configureMainView()
-        configureSearchTextField()
         configureRepositoryTableView()
         configureActivityIndicatorView()
         configureHintLabel()
@@ -92,16 +80,8 @@ final class SearchViewController: UIViewController {
     private func configureMainView() {
         view.backgroundColor = .white
         title = AppConstants.Strings.SearchScreen.title
-    }
-    private func configureSearchTextField() {
-        searchTextField.delegate = self
-        view.addSubview(searchTextField)
-        searchTextField.snp.makeConstraints {
-            $0.top.equalTo(view.safeAreaLayoutGuide.snp.top)
-            $0.leading.equalToSuperview().offset(AppConstants.Constraints.leadingLarge)
-            $0.trailing.equalToSuperview().inset(AppConstants.Constraints.trailingLarge)
-            $0.height.equalTo(AppConstants.Constraints.height)
-        }
+        searchController.searchBar.delegate = self
+        navigationItem.searchController = searchController
     }
     private func configureRepositoryTableView() {
         repositoryTableView.dataSource = self
@@ -114,9 +94,9 @@ final class SearchViewController: UIViewController {
         repositoryTableView.addGestureRecognizer(swipeDownRecognizer)
         view.addSubview(repositoryTableView)
         repositoryTableView.snp.makeConstraints {
-            $0.top.equalTo(searchTextField.snp.bottom).offset(AppConstants.Constraints.verticalSpacingMiddle)
-            $0.leading.equalTo(searchTextField.snp.leading)
-            $0.trailing.equalTo(searchTextField.snp.trailing)
+            $0.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(AppConstants.Constraints.verticalSpacingMiddle)
+            $0.leading.equalTo(view.snp.leading)
+            $0.trailing.equalTo(view.snp.trailing)
             $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom)
         }
     }
@@ -129,7 +109,7 @@ final class SearchViewController: UIViewController {
     private func configureHintLabel() {
         view.addSubview(hintLabel)
         hintLabel.snp.makeConstraints {
-            $0.top.equalTo(searchTextField.snp.bottom).offset(AppConstants.Constraints.verticalSpacingMiddle)
+            $0.centerY.equalToSuperview()
             $0.leading.equalToSuperview().offset(AppConstants.Constraints.leadingLarge)
             $0.trailing.equalToSuperview().inset(AppConstants.Constraints.trailingLarge)
         }
@@ -154,8 +134,7 @@ final class SearchViewController: UIViewController {
         activityIndicatorView.stopAnimating()
         showErrorAlertWith(message)
     }
-    private func searchRepositories() {
-        guard let query = searchTextField.text else { return }
+    private func searchRepositories(query: String) {
         searchEmptyImageView.isHidden = true
         hintLabel.isHidden = true
         activityIndicatorView.startAnimating()
@@ -180,9 +159,14 @@ final class SearchViewController: UIViewController {
         repositoryTableView.tableFooterView?.isHidden = false
         isShowLoadingCell.toggle()
         currentPage += 1
-        guard let query = searchTextField.text else { return }
-        NetworkManager.shared.fetchRepositories(query: query, page: currentPage) { [weak self] result in
-            guard let self, case .success(let response) = result else { return }
+        NetworkManager.shared.fetchRepositories(query: searchText, page: currentPage) { [weak self] result in
+            guard let self, case .success(let response) = result else {
+                DispatchQueue.main.async {
+                    self?.isShowLoadingCell.toggle()
+                    self?.repositoryTableView.tableFooterView?.isHidden = true
+                }
+                return
+            }
             let oldCount = self.repositories.count
             DispatchQueue.main.async {
                 self.repositories.append(contentsOf: response.items)
@@ -201,18 +185,7 @@ final class SearchViewController: UIViewController {
         present(alert, animated: true)
     }
     @objc private func hideKeyboardOnSwipeDown() {
-        view.endEditing(true)
-    }
-}
-
-// MARK: - UITextFieldDelegate
-extension SearchViewController: UITextFieldDelegate {
-    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        textField.resignFirstResponder()
-        guard let text = searchTextField.text,
-              !text.isEmpty else { return true }
-        searchRepositories()
-        return true
+        searchController.searchBar.endEditing(true)
     }
 }
 
@@ -255,5 +228,15 @@ extension SearchViewController: UITableViewDelegate {
 extension SearchViewController: UIGestureRecognizerDelegate {
     func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
         true
+    }
+}
+
+// MARK: - UISearchBarDelegate
+extension SearchViewController: UISearchBarDelegate {
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        guard let query = searchBar.text else { return }
+        searchText = query
+        currentPage = 1
+        searchRepositories(query: searchText.trimmingCharacters(in: .whitespaces))
     }
 }

@@ -27,11 +27,7 @@ final class CoreDataManager {
     /// Saves changes to the managed object context, if any changes exist.
     private func saveContext() {
         if viewContext.hasChanges {
-            do {
-                try viewContext.save()
-            } catch {
-                print("Error occured while saving data: \(error.localizedDescription)")
-            }
+            try? viewContext.save()
         }
     }
 
@@ -78,12 +74,12 @@ final class CoreDataManager {
     /// - Returns: An array of `RepositoryEntity` objects representing the favorite repositories.
     func loadFavorites() -> [RepositoryEntity] {
         let fetchRequest: NSFetchRequest<RepositoryEntity> = RepositoryEntity.fetchRequest()
-        do {
-            let favoriteRepositories = try viewContext.fetch(fetchRequest)
-            return favoriteRepositories
-        } catch {
-            print("Could not fetch favorites: \(error.localizedDescription)")
+        let favoriteRepositories = try? viewContext.fetch(fetchRequest)
+        switch favoriteRepositories {
+        case .none:
+            return []
+        case .some(let favoriteRepositoriesUnwrap):
+            return favoriteRepositoriesUnwrap
         }
-        return []
     }
 }
