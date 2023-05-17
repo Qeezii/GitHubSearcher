@@ -37,7 +37,8 @@ final class SearchViewController: UIViewController {
     }()
     private let hintLabel: UILabel = {
         let label = UILabel()
-        label.text = AppConstants.Strings.SearchScreen.hintLabelTextDefault
+        label.text = AppConstants.Strings.SearchScreen.hintLabelText
+        label.font = .systemFont(ofSize: 12)
         label.numberOfLines = 0
         label.textAlignment = .center
         label.textColor = .black
@@ -94,7 +95,7 @@ final class SearchViewController: UIViewController {
         repositoryTableView.addGestureRecognizer(swipeDownRecognizer)
         view.addSubview(repositoryTableView)
         repositoryTableView.snp.makeConstraints {
-            $0.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(AppConstants.Constraints.verticalSpacingMiddle)
+            $0.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(AppConstants.Constraints.verticalSpacingSmall)
             $0.leading.equalTo(view.snp.leading)
             $0.trailing.equalTo(view.snp.trailing)
             $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom)
@@ -109,7 +110,7 @@ final class SearchViewController: UIViewController {
     private func configureHintLabel() {
         view.addSubview(hintLabel)
         hintLabel.snp.makeConstraints {
-            $0.centerY.equalToSuperview()
+            $0.top.equalTo(view.safeAreaLayoutGuide.snp.top)
             $0.leading.equalToSuperview().offset(AppConstants.Constraints.leadingLarge)
             $0.trailing.equalToSuperview().inset(AppConstants.Constraints.trailingLarge)
         }
@@ -117,18 +118,16 @@ final class SearchViewController: UIViewController {
     private func configureSearchEmptyImage() {
         view.addSubview(searchEmptyImageView)
         searchEmptyImageView.snp.makeConstraints {
-            $0.top.equalTo(hintLabel.snp.bottom).offset(AppConstants.Constraints.verticalSpacingMiddle)
-            $0.centerX.equalTo(view.snp.centerX)
+            $0.center.equalToSuperview()
             $0.width.height.equalTo(view.snp.width).dividedBy(2)
         }
     }
-    private func successResponse() {
+    private func successResponse(_ repositoriesResponse: [RepositoryResponse]) {
+        repositories = repositoriesResponse
         activityIndicatorView.stopAnimating()
         repositoryTableView.reloadData()
         guard repositories.isEmpty else { return }
         searchEmptyImageView.isHidden = false
-        hintLabel.isHidden = false
-        hintLabel.text = AppConstants.Strings.SearchScreen.hintLabelTextNothingFound
     }
     private func errorResponse(message: String) {
         activityIndicatorView.stopAnimating()
@@ -143,8 +142,7 @@ final class SearchViewController: UIViewController {
             switch result {
             case .success(let searchResponse):
                 DispatchQueue.main.async {
-                    self.repositories = searchResponse.items
-                    self.successResponse()
+                    self.successResponse(searchResponse.items)
                 }
             case .failure(let error):
                 DispatchQueue.main.async {
@@ -226,7 +224,8 @@ extension SearchViewController: UITableViewDelegate {
 
 // MARK: - UIGestureRecognizerDelegate
 extension SearchViewController: UIGestureRecognizerDelegate {
-    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer,
+                           shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
         true
     }
 }
@@ -238,5 +237,16 @@ extension SearchViewController: UISearchBarDelegate {
         searchText = query
         currentPage = 1
         searchRepositories(query: searchText.trimmingCharacters(in: .whitespaces))
+    }
+    func searchBarShouldBeginEditing(_ searchBar: UISearchBar) -> Bool {
+        hintLabel.isHidden = true
+        return true
+    }
+    func searchBarShouldEndEditing(_ searchBar: UISearchBar) -> Bool {
+        guard let text = searchBar.text,
+              text.isEmpty,
+              searchText.isEmpty else { return true }
+        hintLabel.isHidden = false
+        return true
     }
 }

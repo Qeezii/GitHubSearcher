@@ -33,8 +33,7 @@ struct AppConstants {
             static let title = "Search repositories"
             static let cellIdentifier = "SearchRepositoryTableViewCell"
             static let searchTextFieldPlaceholder = "Search"
-            static let hintLabelTextDefault = "Enter the text to search for repositories"
-            static let hintLabelTextNothingFound = "Nothing found"
+            static let hintLabelText = "Enter the text to search for repositories"
             static let searchEmptyImageViewImageName = "SearchEmpty"
         }
 
