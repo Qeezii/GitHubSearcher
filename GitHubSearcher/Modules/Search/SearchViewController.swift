@@ -114,7 +114,7 @@ final class SearchViewController: UIViewController {
         repositoryTableView.addGestureRecognizer(swipeDownRecognizer)
         view.addSubview(repositoryTableView)
         repositoryTableView.snp.makeConstraints {
-            $0.top.equalTo(searchTextField.snp.bottom).offset(AppConstants.Constraints.verticalSpacing)
+            $0.top.equalTo(searchTextField.snp.bottom).offset(AppConstants.Constraints.verticalSpacingMiddle)
             $0.leading.equalTo(searchTextField.snp.leading)
             $0.trailing.equalTo(searchTextField.snp.trailing)
             $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom)
@@ -129,7 +129,7 @@ final class SearchViewController: UIViewController {
     private func configureHintLabel() {
         view.addSubview(hintLabel)
         hintLabel.snp.makeConstraints {
-            $0.top.equalTo(searchTextField.snp.bottom).offset(AppConstants.Constraints.verticalSpacing)
+            $0.top.equalTo(searchTextField.snp.bottom).offset(AppConstants.Constraints.verticalSpacingMiddle)
             $0.leading.equalToSuperview().offset(AppConstants.Constraints.leadingLarge)
             $0.trailing.equalToSuperview().inset(AppConstants.Constraints.trailingLarge)
         }
@@ -137,7 +137,7 @@ final class SearchViewController: UIViewController {
     private func configureSearchEmptyImage() {
         view.addSubview(searchEmptyImageView)
         searchEmptyImageView.snp.makeConstraints {
-            $0.top.equalTo(hintLabel.snp.bottom).offset(AppConstants.Constraints.verticalSpacing)
+            $0.top.equalTo(hintLabel.snp.bottom).offset(AppConstants.Constraints.verticalSpacingMiddle)
             $0.centerX.equalTo(view.snp.centerX)
             $0.width.height.equalTo(view.snp.width).dividedBy(2)
         }
@@ -240,7 +240,8 @@ extension SearchViewController: UITableViewDataSource {
 extension SearchViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let repository = repositories[indexPath.row]
-        let detailVC = DetailViewController(repository: repository)
+        let detailVC = DetailViewController()
+        detailVC.getRepository(repository)
         navigationController?.pushViewController(detailVC, animated: true)
     }
 

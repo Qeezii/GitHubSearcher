@@ -31,7 +31,8 @@ class RepositoryTableViewCell: UITableViewCell {
     private func configureFullNameLabel() {
         addSubview(fullNameLabel)
         fullNameLabel.snp.makeConstraints {
-            $0.centerY.equalToSuperview()
+            $0.top.equalToSuperview().offset(AppConstants.Constraints.verticalSpacingSmall)
+            $0.bottom.equalToSuperview().inset(AppConstants.Constraints.verticalSpacingSmall)
             $0.leading.equalToSuperview().offset(AppConstants.Constraints.leadingSmall)
             $0.trailing.equalToSuperview().inset(AppConstants.Constraints.trailingSmall)
         }

@@ -120,7 +120,9 @@ extension FavoritesViewConroller: UITableViewDelegate {
         let favRepository = favorites[indexPath.row]
         let repository = getRepositoryFromCoreData(favRepository)
 
-        let detailVC = DetailViewController(repository: repository, fromFavoritesList: true)
+        let detailVC = DetailViewController()
+        detailVC.getRepository(repository)
+        detailVC.wasLoadedData(true)
         navigationController?.pushViewController(detailVC, animated: true)
     }
 }

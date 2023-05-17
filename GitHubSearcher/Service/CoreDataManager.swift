@@ -15,7 +15,7 @@ final class CoreDataManager {
         let container = NSPersistentContainer(name: AppConstants.Strings.CoreData.containerName)
         container.loadPersistentStores { _, error in
             if let error = error as NSError? {
-                fatalError("Unresolved error \(error), \(error.userInfo)")
+                print("Unresolved error \(error), \(error.userInfo)")
             }
         }
         return container
@@ -47,7 +47,6 @@ final class CoreDataManager {
         return false
     }
 
-    // подумать как переделать логику для красоты
     /// Adds the given repository to the list of favorites.
     /// - Parameter repository: The repository to add.
     func addFavorite(_ repository: RepositoryResponse) {

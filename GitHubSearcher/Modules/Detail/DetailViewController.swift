@@ -11,41 +11,23 @@ import SnapKit
 final class DetailViewController: UIViewController {
 
     // MARK: - Properties
-    var repository: RepositoryResponse
-    var fromFavoritesList: Bool
+    private var repository: RepositoryResponse?
+    private var fromFavoritesList: Bool = false
+    private lazy var topConstraint: ConstraintItem = scrollView.snp.top // view.safeAreaLayoutGuide.snp.top
 
     // MARK: - UI Elements
-    private lazy var repoFullNameLabel: UILabel = {
-        let label = UILabel()
-        cofigureLabel(label,
-                      text: AppConstants.Strings.DetailScreen.fullNameLabelText(repository.fullName))
-        return label
-    }()
-    private lazy var repoDescriptionLabel: UILabel = {
-        let label = UILabel()
-        cofigureLabel(label,
-                      text: AppConstants.Strings.DetailScreen.descriptionLabelText(repository.description))
-        return label
-    }()
-    private lazy var repoOwnerNameLabel: UILabel = {
-        let label = UILabel()
-        cofigureLabel(label, text: "Owner name: \(repository.owner.name ?? "")")
-        return label
-    }()
-    private lazy var repoOwnerEmailLabel: UILabel = {
-        let label = UILabel()
-        cofigureLabel(label,
-                      text: AppConstants.Strings.DetailScreen.ownerNameLabelText(repository.owner.name))
-        return label
-    }()
-    private lazy var favoriteButton: UIButton = {
+    private let scrollView = UIScrollView()
+    private let scrollStackViewContainer = UIStackView()
+    private let repoFullNameLabel = UILabel()
+    private let repoDescriptionLabel = UILabel()
+    private let repoOwnerNameLabel = UILabel()
+    private let repoOwnerEmailLabel = UILabel()
+    private let favoriteButton: UIButton = {
         let button = UIButton()
         button.setTitle(AppConstants.Strings.DetailScreen.favoriteButtunNormalText, for: .normal)
         button.setTitle(AppConstants.Strings.DetailScreen.favoriteBottunSelectedText, for: .selected)
-        button.isSelected = CoreDataManager.shared.isFavorite(repository.id)
         button.backgroundColor = .blue
         button.layer.cornerRadius = 10
-        button.addTarget(self, action: #selector(favoriteButtonIsPressed), for: .touchUpInside)
         return button
     }()
     private let activityIndicatorView: UIActivityIndicatorView = {
@@ -55,22 +37,11 @@ final class DetailViewController: UIViewController {
         return activityIndicator
     }()
 
-    // MARK: - Init
-    init(repository: RepositoryResponse, fromFavoritesList: Bool = false) {
-        self.repository = repository
-        self.fromFavoritesList = fromFavoritesList
-        super.init(nibName: nil, bundle: nil)
-    }
-
-    required init?(coder: NSCoder) {
-        // TODO: сделать алерт
-        fatalError("init(coder:) has not been implemented")
-    }
-
     // MARK: - Override funcs
     override func viewDidLoad() {
         super.viewDidLoad()
         configureMainView()
+        configureScrollView()
         guard !fromFavoritesList else {
             configureUIElements()
             return
@@ -81,6 +52,7 @@ final class DetailViewController: UIViewController {
 
     // MARK: - Methods
     private func configureUIElements() {
+        configureScrollStackViewContainer()
         configureRepoFullNameLabel()
         configureRepoDescriptionLabel()
         configureRepoOwnerNameLabel()
@@ -91,45 +63,81 @@ final class DetailViewController: UIViewController {
         view.backgroundColor = .white
         title = AppConstants.Strings.DetailScreen.title
     }
+    private func configureScrollView() {
+        view.addSubview(scrollView)
+        scrollView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+        }
+    }
+    private func configureScrollStackViewContainer() {
+        scrollView.addSubview(scrollStackViewContainer)
+        scrollStackViewContainer.snp.makeConstraints {
+            $0.top.bottom.equalToSuperview()
+            $0.leading.trailing.equalTo(view)
+        }
+    }
     private func configureRepoFullNameLabel() {
-        view.addSubview(repoFullNameLabel)
+        configureLabel(repoFullNameLabel,
+                      text: AppConstants.Strings.DetailScreen.fullNameLabelText(repository?.fullName))
+        scrollStackViewContainer.addSubview(repoFullNameLabel)
         repoFullNameLabel.snp.makeConstraints {
-            $0.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(AppConstants.Constraints.verticalSpacing)
+            $0.top.equalTo(topConstraint).offset(AppConstants.Constraints.verticalSpacingMiddle)
             $0.leading.equalToSuperview().offset(AppConstants.Constraints.leadingLarge)
             $0.trailing.equalToSuperview().inset(AppConstants.Constraints.trailingLarge)
         }
     }
     private func configureRepoDescriptionLabel() {
-        guard repository.description != nil else { return }
-        view.addSubview(repoDescriptionLabel)
+        topConstraint = repoFullNameLabel.snp.bottom
+        guard repository?.description != nil else { return }
+        configureLabel(repoDescriptionLabel,
+                       text: AppConstants.Strings.DetailScreen.descriptionLabelText(repository?.description))
+        scrollStackViewContainer.addSubview(repoDescriptionLabel)
         repoDescriptionLabel.snp.makeConstraints {
-            $0.top.equalTo(repoFullNameLabel.snp.bottom).offset(AppConstants.Constraints.verticalSpacing)
+            $0.top.equalTo(topConstraint).offset(AppConstants.Constraints.verticalSpacingMiddle)
             $0.leading.equalToSuperview().offset(AppConstants.Constraints.leadingLarge)
             $0.trailing.equalToSuperview().inset(AppConstants.Constraints.trailingLarge)
         }
     }
     private func configureRepoOwnerNameLabel() {
-        guard repository.owner.name != nil else { return }
-        view.addSubview(repoOwnerNameLabel)
+        if repository?.description != nil {
+            topConstraint = repoDescriptionLabel.snp.bottom
+        }
+        guard repository?.owner.name != nil else { return }
+        configureLabel(repoOwnerNameLabel,
+                       text: AppConstants.Strings.DetailScreen.ownerNameLabelText(repository?.owner.name))
+        scrollStackViewContainer.addSubview(repoOwnerNameLabel)
         repoOwnerNameLabel.snp.makeConstraints {
-            $0.top.equalTo(view.snp.centerY).offset(AppConstants.Constraints.verticalSpacing)
+            $0.top.equalTo(topConstraint).offset(AppConstants.Constraints.verticalSpacingMiddle)
             $0.leading.equalToSuperview().offset(AppConstants.Constraints.leadingLarge)
             $0.trailing.equalToSuperview().inset(AppConstants.Constraints.trailingLarge)
         }
     }
     private func configureRepoOwnerEmailLabel() {
-        guard repository.owner.email != nil else { return }
-        view.addSubview(repoOwnerEmailLabel)
+        if repository?.owner.name != nil {
+            topConstraint = repoOwnerNameLabel.snp.bottom
+        }
+        guard repository?.owner.email != nil else { return }
+        configureLabel(repoOwnerEmailLabel,
+                       text: AppConstants.Strings.DetailScreen.ownerEmailLabelText(repository?.owner.email))
+        scrollStackViewContainer.addSubview(repoOwnerEmailLabel)
         repoOwnerEmailLabel.snp.makeConstraints {
-            $0.top.equalTo(repoOwnerNameLabel.snp.bottom).offset(AppConstants.Constraints.verticalSpacing)
+            $0.top.equalTo(topConstraint).offset(AppConstants.Constraints.verticalSpacingMiddle)
             $0.leading.equalToSuperview().offset(AppConstants.Constraints.leadingLarge)
             $0.trailing.equalToSuperview().inset(AppConstants.Constraints.trailingLarge)
         }
     }
     private func configureFavoriteButton() {
-        view.addSubview(favoriteButton)
+        if repository?.owner.email != nil {
+            topConstraint = repoOwnerEmailLabel.snp.bottom
+        }
+        favoriteButton.addTarget(self, action: #selector(favoriteButtonIsPressed), for: .touchUpInside)
+        if let repository {
+            favoriteButton.isSelected = CoreDataManager.shared.isFavorite(repository.id)
+        }
+        scrollStackViewContainer.addSubview(favoriteButton)
         favoriteButton.snp.makeConstraints {
-            $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom).inset(AppConstants.Constraints.verticalSpacing)
+            $0.top.equalTo(topConstraint).offset(AppConstants.Constraints.verticalSpacingLarge)
+            $0.bottom.equalTo(scrollStackViewContainer.snp.bottom).inset(AppConstants.Constraints.verticalSpacingLarge).priority(1)
             $0.leading.equalToSuperview().offset(AppConstants.Constraints.leadingLarge)
             $0.trailing.equalToSuperview().inset(AppConstants.Constraints.trailingLarge)
             $0.height.equalTo(AppConstants.Constraints.height)
@@ -142,18 +150,19 @@ final class DetailViewController: UIViewController {
             $0.center.equalToSuperview()
         }
     }
-    private func cofigureLabel(_ label: UILabel, text: String) {
+    private func configureLabel(_ label: UILabel, text: String?) {
         label.text = text
         label.numberOfLines = 0
         label.textColor = .black
     }
     private func loadOwner() {
-        NetworkManager.shared.fetchOwner(for: repository) { [weak self] result in
+        guard let repositoryUnwrap = repository else { return }
+        NetworkManager.shared.fetchOwner(for: repositoryUnwrap) { [weak self] result in
             guard let self else { return }
             switch result {
             case .success(let owner):
                 DispatchQueue.main.async {
-                    self.repository.owner = owner
+                    self.repository?.owner = owner
                     self.activityIndicatorView.stopAnimating()
                     self.configureUIElements()
                 }
@@ -172,7 +181,14 @@ final class DetailViewController: UIViewController {
         alert.addAction(UIAlertAction(title: "OK", style: .default))
         present(alert, animated: true)
     }
+    func getRepository(_ repositoryResponse: RepositoryResponse) {
+        repository = repositoryResponse
+    }
+    func wasLoadedData(_ wasLoadedData: Bool) {
+        fromFavoritesList = wasLoadedData
+    }
     @objc private func favoriteButtonIsPressed() {
+        guard let repository else { return }
         favoriteButton.isSelected.toggle()
         if favoriteButton.isSelected {
             CoreDataManager.shared.addFavorite(repository)
