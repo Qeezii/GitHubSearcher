@@ -33,8 +33,7 @@ struct AppConstants {
             static let title = "Search repositories"
             static let cellIdentifier = "SearchRepositoryTableViewCell"
             static let searchTextFieldPlaceholder = "Search"
-            static let hintLabelTextDefault = "Enter the text to search for repositories"
-            static let hintLabelTextNothingFound = "Nothing found"
+            static let hintLabelText = "Enter the text to search for repositories"
             static let searchEmptyImageViewImageName = "SearchEmpty"
         }
 
@@ -43,14 +42,17 @@ struct AppConstants {
             static let favoriteButtunNormalText = "Add to favorites"
             static let favoriteBottunSelectedText = "Delete from favorites"
 
-            static func fullNameLabelText(_ fullName: String) -> String {
-                "Repository: \(fullName)"
+            static func fullNameLabelText(_ fullName: String?) -> String {
+                return "Repository: \(fullName ?? "")"
             }
             static func descriptionLabelText(_ description: String?) -> String {
                 "Description: \(description ?? "")"
             }
             static func ownerNameLabelText(_ ownerName: String?) -> String {
-                "Owner email: \(ownerName ?? "")"
+                "Owner name: \(ownerName ?? "")"
+            }
+            static func ownerEmailLabelText(_ ownerEmail: String?) -> String {
+                "Owner email: \(ownerEmail ?? "")"
             }
         }
         struct FavoritesScreen {
@@ -72,7 +74,9 @@ struct AppConstants {
         static let trailingMiddle: CGFloat = 16
         static let trailingSmall: CGFloat = 8
 
-        static let verticalSpacing: CGFloat = 16
+        static let verticalSpacingLarge: CGFloat = 24
+        static let verticalSpacingMiddle: CGFloat = 16
+        static let verticalSpacingSmall: CGFloat = 8
         static let height: CGFloat = 32
     }
 }

@@ -20,10 +20,12 @@
 		9CCCBEA02A09571D0004E7AC /* FavoritesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CCCBE9F2A09571D0004E7AC /* FavoritesViewController.swift */; };
 		9CCCBEA32A095A8F0004E7AC /* RepositoryEntity+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CCCBEA12A095A8F0004E7AC /* RepositoryEntity+CoreDataClass.swift */; };
 		9CCCBEA42A095A8F0004E7AC /* RepositoryEntity+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CCCBEA22A095A8F0004E7AC /* RepositoryEntity+CoreDataProperties.swift */; };
-		9CCCBEA62A095BC50004E7AC /* MainTabBarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CCCBEA52A095BC50004E7AC /* MainTabBarViewController.swift */; };
 		9CCCBEA82A096BC50004E7AC /* NetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CCCBEA72A096BC50004E7AC /* NetworkManager.swift */; };
 		9CFE2D8D2A0FFB650027FAA2 /* AppConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CFE2D8C2A0FFB650027FAA2 /* AppConstants.swift */; };
 		9CFE2D932A10E42C0027FAA2 /* RepositoryTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CFE2D922A10E42C0027FAA2 /* RepositoryTableViewCell.swift */; };
+		9CFE2D962A13CB9B0027FAA2 /* ControllerFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CFE2D952A13CB9B0027FAA2 /* ControllerFactory.swift */; };
+		9CFE2D9E2A1683FE0027FAA2 /* NetworkError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CFE2D9D2A1683FE0027FAA2 /* NetworkError.swift */; };
+		9CFE2DA02A16841C0027FAA2 /* FetchDataMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CFE2D9F2A16841C0027FAA2 /* FetchDataMode.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -41,10 +43,12 @@
 		9CCCBE9F2A09571D0004E7AC /* FavoritesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesViewController.swift; sourceTree = "<group>"; };
 		9CCCBEA12A095A8F0004E7AC /* RepositoryEntity+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RepositoryEntity+CoreDataClass.swift"; sourceTree = "<group>"; };
 		9CCCBEA22A095A8F0004E7AC /* RepositoryEntity+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RepositoryEntity+CoreDataProperties.swift"; sourceTree = "<group>"; };
-		9CCCBEA52A095BC50004E7AC /* MainTabBarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabBarViewController.swift; sourceTree = "<group>"; };
 		9CCCBEA72A096BC50004E7AC /* NetworkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkManager.swift; sourceTree = "<group>"; };
 		9CFE2D8C2A0FFB650027FAA2 /* AppConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConstants.swift; sourceTree = "<group>"; };
 		9CFE2D922A10E42C0027FAA2 /* RepositoryTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepositoryTableViewCell.swift; sourceTree = "<group>"; };
+		9CFE2D952A13CB9B0027FAA2 /* ControllerFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControllerFactory.swift; sourceTree = "<group>"; };
+		9CFE2D9D2A1683FE0027FAA2 /* NetworkError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkError.swift; sourceTree = "<group>"; };
+		9CFE2D9F2A16841C0027FAA2 /* FetchDataMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchDataMode.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -99,8 +103,8 @@
 				9CCCBE722A0556B40004E7AC /* Info.plist */,
 				9C8E82BE2A0A6225002981A7 /* Application */,
 				9CCCBE992A094CD20004E7AC /* Service */,
-				9CFE2D8F2A10D3A40027FAA2 /* ViewController */,
 				9CFE2D8E2A10D39B0027FAA2 /* Model */,
+				9CFE2D982A13D1660027FAA2 /* Modules */,
 				9C8E82BF2A0A6236002981A7 /* Support */,
 			);
 			path = GitHubSearcher;
@@ -119,9 +123,8 @@
 		9CCCBE992A094CD20004E7AC /* Service */ = {
 			isa = PBXGroup;
 			children = (
-				9CCCBE9D2A094E370004E7AC /* CoreDataManager.swift */,
-				9CCCBEA72A096BC50004E7AC /* NetworkManager.swift */,
-				9C8E82B92A0A5D94002981A7 /* API.swift */,
+				9CFE2DA12A1684B20027FAA2 /* Memory */,
+				9CFE2D9C2A1683ED0027FAA2 /* Network */,
 			);
 			path = Service;
 			sourceTree = "<group>";
@@ -135,24 +138,67 @@
 			path = Model;
 			sourceTree = "<group>";
 		};
-		9CFE2D8F2A10D3A40027FAA2 /* ViewController */ = {
-			isa = PBXGroup;
-			children = (
-				9CCCBEA52A095BC50004E7AC /* MainTabBarViewController.swift */,
-				9CCCBE652A0556B30004E7AC /* SearchViewController.swift */,
-				9CCCBE932A0927150004E7AC /* DetailViewController.swift */,
-				9CCCBE9F2A09571D0004E7AC /* FavoritesViewController.swift */,
-				9CFE2D942A10E77A0027FAA2 /* Components */,
-			);
-			path = ViewController;
-			sourceTree = "<group>";
-		};
 		9CFE2D942A10E77A0027FAA2 /* Components */ = {
 			isa = PBXGroup;
 			children = (
 				9CFE2D922A10E42C0027FAA2 /* RepositoryTableViewCell.swift */,
 			);
 			path = Components;
+			sourceTree = "<group>";
+		};
+		9CFE2D982A13D1660027FAA2 /* Modules */ = {
+			isa = PBXGroup;
+			children = (
+				9CFE2D952A13CB9B0027FAA2 /* ControllerFactory.swift */,
+				9CFE2D9B2A13D1A10027FAA2 /* Search */,
+				9CFE2D9A2A13D19F0027FAA2 /* Favorites */,
+				9CFE2D992A13D19D0027FAA2 /* Detail */,
+				9CFE2D942A10E77A0027FAA2 /* Components */,
+			);
+			path = Modules;
+			sourceTree = "<group>";
+		};
+		9CFE2D992A13D19D0027FAA2 /* Detail */ = {
+			isa = PBXGroup;
+			children = (
+				9CCCBE932A0927150004E7AC /* DetailViewController.swift */,
+			);
+			path = Detail;
+			sourceTree = "<group>";
+		};
+		9CFE2D9A2A13D19F0027FAA2 /* Favorites */ = {
+			isa = PBXGroup;
+			children = (
+				9CCCBE9F2A09571D0004E7AC /* FavoritesViewController.swift */,
+			);
+			path = Favorites;
+			sourceTree = "<group>";
+		};
+		9CFE2D9B2A13D1A10027FAA2 /* Search */ = {
+			isa = PBXGroup;
+			children = (
+				9CCCBE652A0556B30004E7AC /* SearchViewController.swift */,
+			);
+			path = Search;
+			sourceTree = "<group>";
+		};
+		9CFE2D9C2A1683ED0027FAA2 /* Network */ = {
+			isa = PBXGroup;
+			children = (
+				9C8E82B92A0A5D94002981A7 /* API.swift */,
+				9CCCBEA72A096BC50004E7AC /* NetworkManager.swift */,
+				9CFE2D9D2A1683FE0027FAA2 /* NetworkError.swift */,
+				9CFE2D9F2A16841C0027FAA2 /* FetchDataMode.swift */,
+			);
+			path = Network;
+			sourceTree = "<group>";
+		};
+		9CFE2DA12A1684B20027FAA2 /* Memory */ = {
+			isa = PBXGroup;
+			children = (
+				9CCCBE9D2A094E370004E7AC /* CoreDataManager.swift */,
+			);
+			path = Memory;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -236,13 +282,15 @@
 				9CCCBE662A0556B30004E7AC /* SearchViewController.swift in Sources */,
 				9CCCBE622A0556B30004E7AC /* AppDelegate.swift in Sources */,
 				9CFE2D8D2A0FFB650027FAA2 /* AppConstants.swift in Sources */,
-				9CCCBEA62A095BC50004E7AC /* MainTabBarViewController.swift in Sources */,
 				9CCCBEA32A095A8F0004E7AC /* RepositoryEntity+CoreDataClass.swift in Sources */,
 				9CCCBEA02A09571D0004E7AC /* FavoritesViewController.swift in Sources */,
+				9CFE2DA02A16841C0027FAA2 /* FetchDataMode.swift in Sources */,
 				9C8E82BA2A0A5D94002981A7 /* API.swift in Sources */,
 				9CFE2D932A10E42C0027FAA2 /* RepositoryTableViewCell.swift in Sources */,
+				9CFE2D9E2A1683FE0027FAA2 /* NetworkError.swift in Sources */,
 				9CCCBE942A0927150004E7AC /* DetailViewController.swift in Sources */,
 				9CCCBE8B2A08FF400004E7AC /* RepositoryListResponse.swift in Sources */,
+				9CFE2D962A13CB9B0027FAA2 /* ControllerFactory.swift in Sources */,
 				9CCCBE9E2A094E370004E7AC /* CoreDataManager.swift in Sources */,
 				9CCCBE6C2A0556B30004E7AC /* GitHubSearcher.xcdatamodeld in Sources */,
 			);
