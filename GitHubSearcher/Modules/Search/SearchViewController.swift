@@ -133,11 +133,11 @@ final class SearchViewController: UIViewController {
         activityIndicatorView.stopAnimating()
         showErrorAlertWith(message)
     }
-    private func searchRepositories(query: String) {
+    private func searchRepositories() {
         searchEmptyImageView.isHidden = true
         hintLabel.isHidden = true
         activityIndicatorView.startAnimating()
-        NetworkManager.shared.fetchRepositories(query: query, page: currentPage) { [weak self] result in
+        NetworkManager.shared.fetchData(mode: .searchRepository, query: searchText, page: currentPage) { [weak self] (result: Result<RepositoryListResponse, Error>) in
             guard let self else { return }
             switch result {
             case .success(let searchResponse):
@@ -157,7 +157,7 @@ final class SearchViewController: UIViewController {
         repositoryTableView.tableFooterView?.isHidden = false
         isShowLoadingCell.toggle()
         currentPage += 1
-        NetworkManager.shared.fetchRepositories(query: searchText, page: currentPage) { [weak self] result in
+        NetworkManager.shared.fetchData(mode: .searchRepository, query: searchText, page: currentPage) { [weak self] (result: Result<RepositoryListResponse, Error>) in
             guard let self, case .success(let response) = result else {
                 DispatchQueue.main.async {
                     self?.isShowLoadingCell.toggle()
@@ -234,9 +234,9 @@ extension SearchViewController: UIGestureRecognizerDelegate {
 extension SearchViewController: UISearchBarDelegate {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         guard let query = searchBar.text else { return }
-        searchText = query
+        searchText = query.trimmingCharacters(in: .whitespaces)
         currentPage = 1
-        searchRepositories(query: searchText.trimmingCharacters(in: .whitespaces))
+        searchRepositories()
     }
     func searchBarShouldBeginEditing(_ searchBar: UISearchBar) -> Bool {
         hintLabel.isHidden = true

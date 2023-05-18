@@ -24,6 +24,8 @@
 		9CFE2D8D2A0FFB650027FAA2 /* AppConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CFE2D8C2A0FFB650027FAA2 /* AppConstants.swift */; };
 		9CFE2D932A10E42C0027FAA2 /* RepositoryTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CFE2D922A10E42C0027FAA2 /* RepositoryTableViewCell.swift */; };
 		9CFE2D962A13CB9B0027FAA2 /* ControllerFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CFE2D952A13CB9B0027FAA2 /* ControllerFactory.swift */; };
+		9CFE2D9E2A1683FE0027FAA2 /* NetworkError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CFE2D9D2A1683FE0027FAA2 /* NetworkError.swift */; };
+		9CFE2DA02A16841C0027FAA2 /* FetchDataMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CFE2D9F2A16841C0027FAA2 /* FetchDataMode.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -45,6 +47,8 @@
 		9CFE2D8C2A0FFB650027FAA2 /* AppConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConstants.swift; sourceTree = "<group>"; };
 		9CFE2D922A10E42C0027FAA2 /* RepositoryTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepositoryTableViewCell.swift; sourceTree = "<group>"; };
 		9CFE2D952A13CB9B0027FAA2 /* ControllerFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControllerFactory.swift; sourceTree = "<group>"; };
+		9CFE2D9D2A1683FE0027FAA2 /* NetworkError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkError.swift; sourceTree = "<group>"; };
+		9CFE2D9F2A16841C0027FAA2 /* FetchDataMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchDataMode.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -119,9 +123,8 @@
 		9CCCBE992A094CD20004E7AC /* Service */ = {
 			isa = PBXGroup;
 			children = (
-				9CCCBE9D2A094E370004E7AC /* CoreDataManager.swift */,
-				9CCCBEA72A096BC50004E7AC /* NetworkManager.swift */,
-				9C8E82B92A0A5D94002981A7 /* API.swift */,
+				9CFE2DA12A1684B20027FAA2 /* Memory */,
+				9CFE2D9C2A1683ED0027FAA2 /* Network */,
 			);
 			path = Service;
 			sourceTree = "<group>";
@@ -177,6 +180,25 @@
 				9CCCBE652A0556B30004E7AC /* SearchViewController.swift */,
 			);
 			path = Search;
+			sourceTree = "<group>";
+		};
+		9CFE2D9C2A1683ED0027FAA2 /* Network */ = {
+			isa = PBXGroup;
+			children = (
+				9C8E82B92A0A5D94002981A7 /* API.swift */,
+				9CCCBEA72A096BC50004E7AC /* NetworkManager.swift */,
+				9CFE2D9D2A1683FE0027FAA2 /* NetworkError.swift */,
+				9CFE2D9F2A16841C0027FAA2 /* FetchDataMode.swift */,
+			);
+			path = Network;
+			sourceTree = "<group>";
+		};
+		9CFE2DA12A1684B20027FAA2 /* Memory */ = {
+			isa = PBXGroup;
+			children = (
+				9CCCBE9D2A094E370004E7AC /* CoreDataManager.swift */,
+			);
+			path = Memory;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -262,8 +284,10 @@
 				9CFE2D8D2A0FFB650027FAA2 /* AppConstants.swift in Sources */,
 				9CCCBEA32A095A8F0004E7AC /* RepositoryEntity+CoreDataClass.swift in Sources */,
 				9CCCBEA02A09571D0004E7AC /* FavoritesViewController.swift in Sources */,
+				9CFE2DA02A16841C0027FAA2 /* FetchDataMode.swift in Sources */,
 				9C8E82BA2A0A5D94002981A7 /* API.swift in Sources */,
 				9CFE2D932A10E42C0027FAA2 /* RepositoryTableViewCell.swift in Sources */,
+				9CFE2D9E2A1683FE0027FAA2 /* NetworkError.swift in Sources */,
 				9CCCBE942A0927150004E7AC /* DetailViewController.swift in Sources */,
 				9CCCBE8B2A08FF400004E7AC /* RepositoryListResponse.swift in Sources */,
 				9CFE2D962A13CB9B0027FAA2 /* ControllerFactory.swift in Sources */,

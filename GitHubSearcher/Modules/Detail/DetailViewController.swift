@@ -13,7 +13,7 @@ final class DetailViewController: UIViewController {
     // MARK: - Properties
     private var repository: RepositoryResponse?
     private var fromFavoritesList: Bool = false
-    private lazy var topConstraint: ConstraintItem = scrollView.snp.top // view.safeAreaLayoutGuide.snp.top
+    private lazy var topConstraint: ConstraintItem = scrollView.snp.top
 
     // MARK: - UI Elements
     private let scrollView = UIScrollView()
@@ -157,7 +157,7 @@ final class DetailViewController: UIViewController {
     }
     private func loadOwner() {
         guard let repositoryUnwrap = repository else { return }
-        NetworkManager.shared.fetchOwner(for: repositoryUnwrap) { [weak self] result in
+        NetworkManager.shared.fetchData(mode: .fetchOwner, userName: repositoryUnwrap.owner.login) { [weak self] (result: Result<OwnerResponse, Error>) in
             guard let self else { return }
             switch result {
             case .success(let owner):
