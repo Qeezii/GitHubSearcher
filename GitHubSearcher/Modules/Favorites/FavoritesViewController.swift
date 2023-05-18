@@ -59,8 +59,8 @@ final class FavoritesViewConroller: UIViewController {
         view.addSubview(favoriteTableView)
         favoriteTableView.snp.makeConstraints {
             $0.top.equalTo(view.safeAreaLayoutGuide.snp.top)
-            $0.leading.equalToSuperview().offset(AppConstants.Constraints.leadingLarge)
-            $0.trailing.equalToSuperview().inset(AppConstants.Constraints.trailingLarge)
+            $0.leading.equalToSuperview()
+            $0.trailing.equalToSuperview()
             $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom)
         }
     }
